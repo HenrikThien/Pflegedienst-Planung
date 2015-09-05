@@ -1,0 +1,137 @@
+﻿<Window x:Class="PflegedientPlan.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Pflegedienst Planung" Width="864" Height="773" WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="Assets/architecture11.png">
+    <Grid Background="Beige">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="400" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" VerticalAlignment="Top" Height="25">
+            <Menu Width="Auto" Height="20">
+                <MenuItem Header="Datei">
+                    <MenuItem x:Name="AppExit" Header="Beenden" HorizontalAlignment="Left" Width="140">
+                        <MenuItem.Icon>
+                            <Image Source="Assets/closed42.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Tools">
+                    <MenuItem x:Name="activityAdd" Header="Aktivität hinzufügen" Click="addActivityMenu_Click" HorizontalAlignment="Left" Width="200">
+                        <MenuItem.Icon>
+                            <Image Source="Assets/plus79.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="categoryAdd" Header="Kategorie hinzufügen" Click="addCategoryMenu_Click" HorizontalAlignment="Left" Width="200">
+                        <MenuItem.Icon>
+                            <Image Source="Assets/plus79.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Hilfe">
+                    <MenuItem x:Name="About" Header="Über das Programm" HorizontalAlignment="Left" Width="190">
+                        <MenuItem.Icon>
+                            <Image Source="Assets/clouds74.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+        </StackPanel>
+        <Grid Grid.Column="0" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Label Content="Patient Nummer:" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Label Content="Patient Vorname:" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Label Content="Patient Nachname:" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Label Content="Patient Geburtsdatum:" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+            <TextBox x:Name="patNrBox" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0" />
+            <TextBox x:Name="patVornameBox" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0" />
+            <TextBox x:Name="patNachnameBox" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0" />
+            <TextBox x:Name="patGeburtsDatumBox" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0" />
+
+            <Button Content="Hinzufügen" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Height="25" Margin="10" Click="Button_Click"/>
+        </Grid>
+
+        <DataGrid x:Name="userGrid" Background="Beige" Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" IsReadOnly="True" BorderThickness="0" SelectionMode="Single" MaxHeight="200" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="#Nummer" Width="*"
+                            Binding="{Binding PatientId}"/>
+                <DataGridTextColumn Header="Vorname" Width="*"
+                            Binding="{Binding PatientVorname}"/>
+                <DataGridTextColumn Header="Nachname" Width="*"
+                            Binding="{Binding PatientNachname}" />
+                <DataGridTextColumn Header="Geburtsdatum" Width="*"
+                            Binding="{Binding PatientGeburtsdatum}" />
+            </DataGrid.Columns>
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Patienten löschen" Click="contextMenuDeletePatient_Click">
+                        <MenuItem.Icon>
+                            <Image Source="Assets/delete84.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Patient bearbeiten">
+                        <MenuItem.Icon>
+                            <Image Source="Assets/edit46.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
+
+        <!-- Oben ende -->
+        <!-- Unten start -->
+
+        <!-- Select Activity ComboBox start -->
+        <Grid Grid.Column="0" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="75" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Aktivität:" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <ComboBox x:Name="activitysComboBox" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5" />
+        </Grid>
+        <!-- Select Activity ComboBox end -->
+
+        <!-- Select category combobox start -->
+        <Grid Grid.Column="0" Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="75" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Kategorie:" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Height="26" Margin="2,3,9,3" Width="64" />
+            <ComboBox x:Name="categoryCombobox" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5" Height="22" />
+        </Grid>
+        <!-- Select category combobox end -->
+        
+        <!-- Program seperator start -->
+        <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Margin="10" />
+        <!-- Program seperator end -->
+        
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Brown">
+            
+        </StackPanel>
+    </Grid>
+</Window>
