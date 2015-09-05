@@ -18,9 +18,6 @@
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Aktivität löschen" Click="contextMenuDeleteActivity_Click">
-                        <MenuItem.Icon>
-                            <Image Source="Assets/delete84.png" />
-                        </MenuItem.Icon>
                     </MenuItem>
                 </ContextMenu>
             </DataGrid.ContextMenu>

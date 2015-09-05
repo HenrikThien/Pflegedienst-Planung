@@ -330,5 +330,15 @@ namespace PflegedientPlan
             {
             }
         }
+
+        private void mainMenuClose_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Das Programm jetzt beenden?", "Beenden", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                Application.Current.Shutdown();
+            }
+        }
     }
 }
