@@ -9,6 +9,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -108,12 +109,18 @@
         </Grid>
         <!-- Select category combobox end -->
         
+        <!-- Add start -->
+        <Button x:Name="openAddResourcesWindow" Content="Neue Resourcen hinzufügen" Grid.Column="0" Grid.Row="4" Margin="10" Height="25" Click="openAddNewResourcesWindow_Click" />
+        <!-- Add end -->
+        
         <!-- Program seperator start -->
-        <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Margin="10" />
+        <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" Margin="10" />
         <!-- Program seperator end -->
         
-        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Brown">
+        <!-- Uebersicht start -->
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Brown">
             
         </StackPanel>
+        <!-- Uebersicht end -->
     </Grid>
 </Window>

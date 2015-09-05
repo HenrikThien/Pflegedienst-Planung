@@ -190,7 +190,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Pflegedienst Planung"
         "ProductCode" = "8:{F1FFF7DF-1D78-4248-877A-10B207769C6A}"
-        "PackageCode" = "8:{3A7B3CBA-7C1F-40B5-9982-CF29865B86DE}"
+        "PackageCode" = "8:{995A192F-D864-4320-A88A-E9374D5EA8E1}"
         "UpgradeCode" = "8:{6ADD5C24-F811-4DAF-88F6-03E0291E8D0F}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -521,7 +521,7 @@
                             "ContextData" = "8:1;True=1;False=0"
                             "Attributes" = "3:0"
                             "Setting" = "3:0"
-                            "Value" = "3:0"
+                            "Value" = "3:1"
                             "DefaultValue" = "3:1"
                             "UsePlugInResources" = "11:TRUE"
                             }

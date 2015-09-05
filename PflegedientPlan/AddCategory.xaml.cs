@@ -170,5 +170,53 @@ namespace PflegedientPlan
 
             OnMainNeedsAnUpdate.Invoke(_categoryList);
         }
+
+        private async void contextMenuDeleteCategory_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedCategory = (categoryDataGrid.SelectedItem as Category);
+
+            if (selectedCategory == null)
+                return;
+
+            var result = MessageBox.Show("\"" + selectedCategory.CategoryDescription + "\"\n Jetzt löschen?", "Löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await DeleteAsync(selectedCategory);
+            }
+        }
+
+        private async Task DeleteAsync(Category category)
+        {
+            try
+            {
+                using (var client = new DatabaseClient())
+                {
+                    if (await client.OpenConnectionAsync())
+                    {
+                        client.AddParam<int>("@category_id", category.Id);
+                        var count = await client.ExecuteAsync("DELETE FROM categorys WHERE Id = @category_id;");
+                        client.ClearParameter();
+
+                        if (count > 0)
+                        {
+                            MessageBox.Show("Die Kategorie wurde erfolgreich gelöscht", "Gelöscht");
+                        }
+                    }
+                }
+
+                var categoryToRemove = _categoryList.Select(c => c).Where(c => c.Id == category.Id).FirstOrDefault();
+
+                if (categoryToRemove != null)
+                {
+                    _categoryList.Remove(categoryToRemove);
+                    OnMainNeedsAnUpdate.Invoke(_categoryList);
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteException(ex);
+            }
+        }
     }
 }

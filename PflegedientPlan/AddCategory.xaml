@@ -17,6 +17,12 @@
                 <DataGridTextColumn Header="Kategorie" Width="*"
                             Binding="{Binding CategoryDescription}" />
             </DataGrid.Columns>
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Kategorie löschen" Click="contextMenuDeleteCategory_Click">
+                    </MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
         </DataGrid>
 
         <Grid Grid.Row="1">

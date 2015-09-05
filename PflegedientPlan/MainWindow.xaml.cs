@@ -340,5 +340,34 @@ namespace PflegedientPlan
                 Application.Current.Shutdown();
             }
         }
+
+        private void openAddNewResourcesWindow_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedPatient = (userGrid.SelectedItem as Patient);
+
+            if (selectedPatient == null)
+            {
+                MessageBox.Show("Es wurde kein Patient ausgewählt.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var selectedActivity = (activitysComboBox.SelectedItem as Activity);
+
+            if (selectedActivity == null)
+            {
+                MessageBox.Show("Es wurde keine Aktivität ausgewählt.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var selectedCategory = (categoryCombobox.SelectedItem as Category);
+
+            if (selectedCategory == null)
+            {
+                MessageBox.Show("Es wurde keine Kategorie ausgewählt.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+
+        }
     }
 }
