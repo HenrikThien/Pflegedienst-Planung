@@ -10,6 +10,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -46,22 +47,33 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Label Content="Patient Nummer:" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <Label Content="Patient Vorname:" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <Label Content="Patient Nachname:" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <Label Content="Patient Geburtsdatum:" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" />
-
+            <Label Content="Patient Geschlecht:" Grid.Column="0" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            
             <TextBox x:Name="patNrBox" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0" />
             <TextBox x:Name="patVornameBox" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0" />
             <TextBox x:Name="patNachnameBox" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0" />
             <TextBox x:Name="patGeburtsDatumBox" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0" />
-
-            <Button Content="Hinzufügen" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Height="25" Margin="10" Click="Button_Click"/>
+            
+            <ComboBox x:Name="patGender" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0" SelectedIndex="0">
+                <ComboBoxItem Content="Männlich" />
+                <ComboBoxItem Content="Weiblich" />
+            </ComboBox>
+            
+            <Button Content="Hinzufügen" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" Height="25" Margin="10" Click="Button_Click"/>
         </Grid>
 
-        <DataGrid x:Name="userGrid" Background="Beige" Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" IsReadOnly="True" BorderThickness="0" SelectionMode="Single" MaxHeight="200" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
+        <!-- Program seperator start -->
+        <Separator Grid.Column="0" Grid.Row="2" Margin="10" />
+        <!-- Program seperator end -->
+
+        <DataGrid x:Name="userGrid" Background="Beige" Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" IsReadOnly="True" BorderThickness="0" SelectionMode="Single" MaxHeight="300" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="#Nummer" Width="*"
                             Binding="{Binding PatientId}"/>
@@ -71,6 +83,8 @@
                             Binding="{Binding PatientNachname}" />
                 <DataGridTextColumn Header="Geburtsdatum" Width="*"
                             Binding="{Binding PatientGeburtsdatum}" />
+                <DataGridTextColumn Header="Geschlecht" Width="*" 
+                            Binding="{Binding PatientGenderToString}" />
             </DataGrid.Columns>
             <DataGrid.ContextMenu>
                 <ContextMenu>
@@ -86,7 +100,7 @@
         <!-- Unten start -->
 
         <!-- Select Activity ComboBox start -->
-        <Grid Grid.Column="0" Grid.Row="2">
+        <Grid Grid.Column="0" Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" MinWidth="75" />
                 <ColumnDefinition Width="*" />
@@ -98,7 +112,7 @@
         <!-- Select Activity ComboBox end -->
 
         <!-- Select category combobox start -->
-        <Grid Grid.Column="0" Grid.Row="3">
+        <Grid Grid.Column="0" Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" MinWidth="75" />
                 <ColumnDefinition />
@@ -110,15 +124,15 @@
         <!-- Select category combobox end -->
         
         <!-- Add start -->
-        <Button x:Name="openAddResourcesWindow" Content="Neue Resourcen hinzufügen" Grid.Column="0" Grid.Row="4" Margin="10" Height="25" Click="openAddNewResourcesWindow_Click" />
+        <Button x:Name="openAddResourcesWindow" Content="Neue Resourcen hinzufügen" Grid.Column="0" Grid.Row="5" Margin="10" Height="25" Click="openAddNewResourcesWindow_Click" />
         <!-- Add end -->
         
         <!-- Program seperator start -->
-        <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" Margin="10" />
+        <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6" Margin="10" />
         <!-- Program seperator end -->
         
         <!-- Uebersicht start -->
-        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Brown">
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="7" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Brown">
             
         </StackPanel>
         <!-- Uebersicht end -->

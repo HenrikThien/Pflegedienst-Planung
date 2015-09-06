@@ -104,7 +104,8 @@ namespace PflegedientPlan
                                     PatientId = reader.GetInt32(0),
                                     PatientVorname = reader.GetString(1),
                                     PatientNachname = reader.GetString(2),
-                                    PatientGeburtsdatum = reader.GetString(3)
+                                    PatientGeburtsdatum = reader.GetString(3),
+                                    PatientGender = (Gender)reader.GetInt32(4)
                                 };
 
                                 _patientList.Add(patient);
@@ -194,7 +195,8 @@ namespace PflegedientPlan
                         PatientId = int.Parse(patNrBox.Text),
                         PatientVorname = patVornameBox.Text,
                         PatientNachname = patNachnameBox.Text,
-                        PatientGeburtsdatum = patGeburtsDatumBox.Text
+                        PatientGeburtsdatum = patGeburtsDatumBox.Text,
+                        PatientGender = (patGender.SelectedIndex == 0) ? Gender.MALE : Gender.FEMALE
                     };
 
                     if (patient.PatientId != null && !string.IsNullOrEmpty(patient.PatientVorname) && !string.IsNullOrEmpty(patient.PatientNachname) && !string.IsNullOrEmpty(patient.PatientGeburtsdatum))
@@ -241,8 +243,9 @@ namespace PflegedientPlan
                     client.AddParam<string>("@vorname", patient.PatientVorname);
                     client.AddParam<string>("@nachname", patient.PatientNachname);
                     client.AddParam<string>("@gebdat", patient.PatientGeburtsdatum);
+                    client.AddParam<int>("@gender", (int)patient.PatientGender);
 
-                    var state = await client.InsertAsync("INSERT INTO patienten (pat_nr, pat_vorname, pat_nachname, pat_geburtsdatum) VALUES (@patnr, @vorname, @nachname, @gebdat);");
+                    var state = await client.InsertAsync("INSERT INTO patienten (pat_nr, pat_vorname, pat_nachname, pat_geburtsdatum, pat_gender) VALUES (@patnr, @vorname, @nachname, @gebdat, @gender);");
                 }
             }
         }
