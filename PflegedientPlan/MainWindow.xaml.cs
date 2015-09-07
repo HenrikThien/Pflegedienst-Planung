@@ -71,6 +71,16 @@ namespace PflegedientPlan
                     categoryCombobox.SelectedIndex = 0;
                 }
             }
+
+            ClearValue(HeightProperty);
+            ClearValue(WidthProperty);
+            ClearValue(MaxHeightProperty);
+            ClearValue(MaxWidthProperty);
+            ClearValue(MinHeightProperty);
+            ClearValue(MinWidthProperty);
+            progressGrid.Visibility = System.Windows.Visibility.Hidden;
+            mainGrid.Visibility = System.Windows.Visibility.Visible;
+            WindowState = System.Windows.WindowState.Maximized;
         }
         #endregion
 
@@ -369,8 +379,6 @@ namespace PflegedientPlan
                 MessageBox.Show("Es wurde keine Kategorie ausgewählt.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
-
         }
     }
 }
