@@ -72,6 +72,8 @@ namespace PflegedientPlan
                 }
             }
 
+            await Task.Run(() => Thread.Sleep(2000));
+
             ClearValue(HeightProperty);
             ClearValue(WidthProperty);
             ClearValue(MaxHeightProperty);
