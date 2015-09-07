@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PflegedientPlan.Classes;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -26,6 +27,8 @@ namespace PflegedientPlan
         private readonly ObservableCollection<Patient> _patientList = new ObservableCollection<Patient>();
         private ObservableCollection<Activity> _activityList = new ObservableCollection<Activity>();
         private ObservableCollection<Category> _categoryList = new ObservableCollection<Category>();
+
+        private readonly ObservableCollection<Problem> _problemList = new ObservableCollection<Problem>();
 
         public MainWindow()
         {
@@ -381,6 +384,15 @@ namespace PflegedientPlan
                 MessageBox.Show("Es wurde keine Kategorie ausgewählt.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+
+            var addToMaskWindow = new AddToMask(selectedPatient, selectedActivity, selectedCategory, _problemList);
+            addToMaskWindow.OnProblemListUpdated += addToMaskWindow_OnProblemListUpdated;
+            addToMaskWindow.Show();
+        }
+
+        private void addToMaskWindow_OnProblemListUpdated(ObservableCollection<Problem> selectedList)
+        {
+            problemsDataGrid.ItemsSource = selectedList.OrderBy(p => p.Position).ToList();
         }
     }
 }
