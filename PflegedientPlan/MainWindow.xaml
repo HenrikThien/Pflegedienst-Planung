@@ -164,22 +164,13 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>                  
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0" Click="problemsListBoxItemUP_Click">
                             <Image Source="Assets/navigate6.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1" Click="problemsListBoxItemDown_Click">
                             <Image Source="Assets/arrow483.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2">
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
@@ -206,22 +197,13 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0">
                             <Image Source="Assets/navigate6.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1">
                             <Image Source="Assets/arrow483.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2">
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
@@ -248,22 +230,13 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0">
                             <Image Source="Assets/navigate6.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1">
                             <Image Source="Assets/arrow483.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2">
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
@@ -290,22 +263,13 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0">
                             <Image Source="Assets/navigate6.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1">
                             <Image Source="Assets/arrow483.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2"
-                            Margin="{Binding ElementName=MarginSlider, Path=Value}" 
-                            Padding="{Binding ElementName=PaddingSlider, Path=Value}"
-                            IsEnabled="{Binding Path=IsChecked, ElementName=IsEnabledCheckBox}">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2">
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 

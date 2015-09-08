@@ -75,7 +75,7 @@ namespace PflegedientPlan
                 }
             }
 
-            await Task.Run(() => Thread.Sleep(2000));
+            await Task.Run(() => Thread.Sleep(1000));
 
             ClearValue(HeightProperty);
             ClearValue(WidthProperty);
@@ -385,14 +385,68 @@ namespace PflegedientPlan
                 return;
             }
 
-            var addToMaskWindow = new AddToMask(selectedPatient, selectedActivity, selectedCategory, _problemList);
+            var addToMaskWindow = new AddToMask(selectedPatient, selectedActivity, selectedCategory);
             addToMaskWindow.OnProblemListUpdated += addToMaskWindow_OnProblemListUpdated;
             addToMaskWindow.Show();
         }
 
-        private void addToMaskWindow_OnProblemListUpdated(ObservableCollection<Problem> selectedList)
+        private void addToMaskWindow_OnProblemListUpdated()
         {
-            problemsDataGrid.ItemsSource = selectedList.OrderBy(p => p.Position).ToList();
+            problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems;
         }
+
+        #region Problems listbox
+        private void problemsListBoxItemUP_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedProblem = (problemsDataGrid.SelectedItem as Problem);
+
+            if (selectedProblem == null)
+                return;
+
+            int currentItemPosition = selectedProblem.Position;
+
+            if (currentItemPosition == 0)
+            {
+                return;
+            }
+
+            var itemOnPositionAbove = (problemsDataGrid.Items[currentItemPosition - 1] as Problem);
+
+            selectedProblem.Position -= 1;
+
+            if (itemOnPositionAbove == null)
+                return;
+
+            itemOnPositionAbove.Position += 1;
+
+            problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems.OrderBy(p => p.Position).ToList();
+        }
+
+        private void problemsListBoxItemDown_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedProblem = (problemsDataGrid.SelectedItem as Problem);
+
+            if (selectedProblem == null)
+                return;
+
+            int currentItemPosition = selectedProblem.Position;
+
+            if (currentItemPosition == problemsDataGrid.Items.Count - 1)
+            {
+                return;
+            }
+
+            var itemOnPositionAbove = (problemsDataGrid.Items[currentItemPosition + 1] as Problem);
+
+            selectedProblem.Position += 1;
+
+            if (itemOnPositionAbove == null)
+                return;
+
+            itemOnPositionAbove.Position -= 1;
+
+            problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems.OrderBy(p => p.Position).ToList();
+        }
+        #endregion
     }
 }

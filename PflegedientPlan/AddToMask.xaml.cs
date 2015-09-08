@@ -21,7 +21,7 @@ namespace PflegedientPlan
     /// </summary>
     public partial class AddToMask : Window
     {
-        public delegate void NewProblemAddedToMain(ObservableCollection<Problem> selectedList);
+        public delegate void NewProblemAddedToMain();
         public event NewProblemAddedToMain OnProblemListUpdated;
 
         private Patient SelectedPatient { get; set; }
@@ -29,16 +29,12 @@ namespace PflegedientPlan
         private Category SelectedCategory { get; set; }
 
         private readonly ObservableCollection<Problem> _problemsList = new ObservableCollection<Problem>();
-        private readonly ObservableCollection<Problem> _selectedProblems = new ObservableCollection<Problem>();
 
-        public AddToMask(Patient patient, Activity activity, Category category, ObservableCollection<Problem> selectedProblems)
+        public AddToMask(Patient patient, Activity activity, Category category)
         {
             SelectedPatient = patient;
             SelectedActivity = activity;
             SelectedCategory = category;
-
-            _selectedProblems.Clear();
-            _selectedProblems = selectedProblems;
 
             InitializeComponent();
             Init();
@@ -47,15 +43,23 @@ namespace PflegedientPlan
         private async void Init()
         {
             await LoadProblemsAsync();
+            LoadSelectedProblems();
+        }
 
-            if (_selectedProblems.Count > 0)
-            {
-                // set checkboxes
-                foreach (var problem in _selectedProblems)
+        private async void LoadSelectedProblems()
+        {
+                if (StaticHolder.SelectedProblems.Count > 0)
                 {
-                    (problemsListBox.Items.GetItemAt(problem.Id) as CheckBox).IsChecked = true;
+                    foreach (var problem in StaticHolder.SelectedProblems)
+                    {
+                        var item = (_problemsList.Select(p => p).Where(p => p.Id == problem.Id).FirstOrDefault());
+
+                        if (item != null)
+                        {
+                            item.IsChecked = true;
+                        }
+                    }
                 }
-            }
         }
 
         #region Load problems async
@@ -77,12 +81,15 @@ namespace PflegedientPlan
                                 {
                                     Id = reader.GetInt32(0),
                                     Position = reader.GetInt32(1),
-                                    Description = reader.GetString(2)
+                                    Description = reader.GetString(2),
+                                    IsChecked = false
                                 };
 
                                 problem.Description = ReplacePlaceholder(problem.Description);
 
                                 _problemsList.Add(problem);
+                                var realIndex = _problemsList.IndexOf(problem);
+                                _problemsList.ElementAt(realIndex).RealListIndex = realIndex;
                             }
                         }
                     }
@@ -110,9 +117,12 @@ namespace PflegedientPlan
                         client.ClearParameter();
                     }
                 }
-            }
 
-            await LoadProblemsAsync();
+                newProblemTextBox.Text = "";
+
+                await LoadProblemsAsync();
+                LoadSelectedProblems();
+            }
         }
         #endregion
 
@@ -144,10 +154,16 @@ namespace PflegedientPlan
             if (problem == null)
                 return;
 
-            problem.Position = _selectedProblems.Count;
+            var exists = StaticHolder.SelectedProblems.Select(p => p).Where(p => p.Id == problem.Id).ToList();
 
-            _selectedProblems.Add(problem);
-            OnProblemListUpdated.Invoke(_selectedProblems);
+            if (exists.Count <= 0)
+            {
+                problem.IsChecked = true;
+                problem.Position = StaticHolder.SelectedProblems.Count;
+                StaticHolder.SelectedProblems.Add(problem);
+            }
+
+            OnProblemListUpdated.Invoke();
         }
 
         private void OnProblemUnchecked(object sender, RoutedEventArgs e)
@@ -162,8 +178,15 @@ namespace PflegedientPlan
             if (problem == null)
                 return;
 
-            _selectedProblems.Remove(problem);
-            OnProblemListUpdated.Invoke(_selectedProblems);
+            var probToRemove = StaticHolder.SelectedProblems.Select(p => p).Where(p => p.Id == problem.Id).FirstOrDefault();
+
+            if (probToRemove == null)
+                return;
+
+            probToRemove.IsChecked = false;
+            StaticHolder.SelectedProblems.Remove(probToRemove);
+
+            OnProblemListUpdated.Invoke();
         }
         #endregion
     }

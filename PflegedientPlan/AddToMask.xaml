@@ -1,7 +1,7 @@
 ﻿<Window x:Class="PflegedientPlan.AddToMask"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="AddToMask" WindowState="Maximized">
+        Title="AddToMask" Height="600" Width="700">
     <Grid>
         <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <TabItem x:Name="tabProblems" Header="Probleme">
@@ -15,7 +15,7 @@
                         <ListBox x:Name="problemsListBox" ItemsSource="{Binding}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <CheckBox Content="{Binding Description}" IsChecked="False"  Margin="5 5 0 0" Checked="OnProblemChecked" Unchecked="OnProblemUnchecked" />
+                                    <CheckBox Content="{Binding Description}" IsChecked="{Binding IsChecked}"  Margin="5 5 0 0" Checked="OnProblemChecked" Unchecked="OnProblemUnchecked" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
