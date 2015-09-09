@@ -82,6 +82,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\Measure.cs" />
+    <Compile Include="Classes\Resource.cs" />
+    <Compile Include="Classes\Target.cs" />
     <Compile Include="StaticHolder.cs" />
     <Page Include="AddActivity.xaml">
       <SubType>Designer</SubType>

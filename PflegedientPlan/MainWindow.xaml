@@ -170,7 +170,7 @@
                         <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1" Click="problemsListBoxItemDown_Click">
                             <Image Source="Assets/arrow483.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2" Click="problemsListBoxItemDelete_Click">
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
@@ -197,22 +197,22 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0" Click="resourcesListBoxItemUP_Click">
                             <Image Source="Assets/navigate6.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1" Click="resourcesListBoxItemDown_Click">
                             <Image Source="Assets/arrow483.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2" Click="resourcesListBoxItemDelete_Click">
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
                         <DataGrid x:Name="resourcesDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="True" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#Pos." Width="Auto"
-                            Binding="{Binding PatientId}"/>
+                            Binding="{Binding Position}"/>
                                 <DataGridTextColumn Header="Ressource" Width="*"
-                            Binding="{Binding PatientVorname}"/>
+                            Binding="{Binding Description}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
@@ -230,22 +230,22 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0" Click="targetsListBoxItemUP_Click">
                             <Image Source="Assets/navigate6.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1" Click="targetsListBoxItemDown_Click">
                             <Image Source="Assets/arrow483.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2" Click="targetsListBoxItemDelete_Click">
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
-                        <DataGrid x:Name="zieleDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="True" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
+                        <DataGrid x:Name="targetsDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="True" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#Pos." Width="Auto"
-                            Binding="{Binding PatientId}"/>
+                            Binding="{Binding Position}"/>
                                 <DataGridTextColumn Header="Ziel" Width="*"
-                            Binding="{Binding PatientVorname}"/>
+                            Binding="{Binding Description}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>

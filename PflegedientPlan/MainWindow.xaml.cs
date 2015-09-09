@@ -24,11 +24,11 @@ namespace PflegedientPlan
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Patient SelectedPatient { get; set; }
+
         private readonly ObservableCollection<Patient> _patientList = new ObservableCollection<Patient>();
         private ObservableCollection<Activity> _activityList = new ObservableCollection<Activity>();
         private ObservableCollection<Category> _categoryList = new ObservableCollection<Category>();
-
-        private readonly ObservableCollection<Problem> _problemList = new ObservableCollection<Problem>();
 
         public MainWindow()
         {
@@ -56,6 +56,33 @@ namespace PflegedientPlan
         private void userGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var patient = (e.AddedItems[0] as Patient);
+
+            if (patient == null)
+                return;
+
+            SelectedPatient = patient;
+
+            // reload problemslist
+            if (!StaticHolder.SelectedProblems.ContainsKey(patient.PatientId))
+            {
+                StaticHolder.SelectedProblems.Add(patient.PatientId, new ObservableCollection<Problem>());
+            }
+
+            problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems[patient.PatientId];
+
+            if (!StaticHolder.SelectedResources.ContainsKey(patient.PatientId))
+            {
+                StaticHolder.SelectedResources.Add(patient.PatientId, new ObservableCollection<Resource>());
+            }
+
+            resourcesDataGrid.ItemsSource = StaticHolder.SelectedResources[patient.PatientId];
+
+            if (!StaticHolder.SelectedTargets.ContainsKey(patient.PatientId))
+            {
+                StaticHolder.SelectedTargets.Add(patient.PatientId, new ObservableCollection<Target>());
+            }
+
+            targetsDataGrid.ItemsSource = StaticHolder.SelectedTargets[patient.PatientId];
         }
 
         #region Init program, load items async
@@ -387,15 +414,20 @@ namespace PflegedientPlan
 
             var addToMaskWindow = new AddToMask(selectedPatient, selectedActivity, selectedCategory);
             addToMaskWindow.OnProblemListUpdated += addToMaskWindow_OnProblemListUpdated;
+            addToMaskWindow.OnResourceListUpdated += addToMaskWindow_OnResourceListUpdated;
+            addToMaskWindow.OnTargetListUpdated += addToMaskWindow_OnTargetListUpdated;
             addToMaskWindow.Show();
         }
 
+        #region Problems listbox
         private void addToMaskWindow_OnProblemListUpdated()
         {
-            problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems;
+            if (SelectedPatient == null)
+                return;
+
+            problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems[SelectedPatient.PatientId];
         }
 
-        #region Problems listbox
         private void problemsListBoxItemUP_Click(object sender, RoutedEventArgs e)
         {
             var selectedProblem = (problemsDataGrid.SelectedItem as Problem);
@@ -419,7 +451,7 @@ namespace PflegedientPlan
 
             itemOnPositionAbove.Position += 1;
 
-            problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems.OrderBy(p => p.Position).ToList();
+            problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems[SelectedPatient.PatientId].OrderBy(p => p.Position).ToList();
         }
 
         private void problemsListBoxItemDown_Click(object sender, RoutedEventArgs e)
@@ -445,7 +477,203 @@ namespace PflegedientPlan
 
             itemOnPositionAbove.Position -= 1;
 
-            problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems.OrderBy(p => p.Position).ToList();
+            problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems[SelectedPatient.PatientId].OrderBy(p => p.Position).ToList();
+        }
+
+        private void problemsListBoxItemDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedProblem = (problemsDataGrid.SelectedItem as Problem);
+
+            if (selectedProblem == null)
+                return;
+
+            StaticHolder.SelectedProblems[SelectedPatient.PatientId].Remove(selectedProblem);
+            UpdateProblemsPositions(selectedProblem.Position);
+        }
+
+        private void UpdateProblemsPositions(int fromId)
+        {
+            if (SelectedPatient == null)
+                return;
+
+            foreach (var item in StaticHolder.SelectedProblems[SelectedPatient.PatientId].Select(p => p).Where(p => p.Position > fromId).ToList())
+            {
+                item.Position -= 1;
+            }
+
+            problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems[SelectedPatient.PatientId].OrderBy(p => p.Position).ToList();
+        }
+        #endregion
+
+        #region Resources listbox
+        private void addToMaskWindow_OnResourceListUpdated()
+        {
+            if (SelectedPatient == null)
+                return;
+
+            resourcesDataGrid.ItemsSource = StaticHolder.SelectedResources[SelectedPatient.PatientId];
+        }
+
+        private void resourcesListBoxItemUP_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedResource = (resourcesDataGrid.SelectedItem as Resource);
+
+            if (selectedResource == null)
+                return;
+
+            int currentItemPosition = selectedResource.Position;
+
+            if (currentItemPosition == 0)
+            {
+                return;
+            }
+
+            var itemOnPositionAbove = (resourcesDataGrid.Items[currentItemPosition - 1] as Resource);
+
+            selectedResource.Position -= 1;
+
+            if (itemOnPositionAbove == null)
+                return;
+
+            itemOnPositionAbove.Position += 1;
+
+            resourcesDataGrid.ItemsSource = StaticHolder.SelectedResources[SelectedPatient.PatientId].OrderBy(r => r.Position).ToList();
+        }
+
+        private void resourcesListBoxItemDown_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedResource = (resourcesDataGrid.SelectedItem as Resource);
+
+            if (selectedResource == null)
+                return;
+
+            int currentItemPosition = selectedResource.Position;
+
+            if (currentItemPosition == resourcesDataGrid.Items.Count - 1)
+            {
+                return;
+            }
+
+            var itemOnPositionAbove = (resourcesDataGrid.Items[currentItemPosition + 1] as Resource);
+
+            selectedResource.Position += 1;
+
+            if (itemOnPositionAbove == null)
+                return;
+
+            itemOnPositionAbove.Position -= 1;
+
+            resourcesDataGrid.ItemsSource = StaticHolder.SelectedResources[SelectedPatient.PatientId].OrderBy(r => r.Position).ToList();
+        }
+
+        private void resourcesListBoxItemDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedResource = (resourcesDataGrid.SelectedItem as Resource);
+
+            if (selectedResource == null)
+                return;
+
+            StaticHolder.SelectedResources[SelectedPatient.PatientId].Remove(selectedResource);
+            UpdateResourcesPositions(selectedResource.Position);
+        }
+
+        private void UpdateResourcesPositions(int fromId)
+        {
+            if (SelectedPatient == null)
+                return;
+
+            foreach (var item in StaticHolder.SelectedResources[SelectedPatient.PatientId].Select(r => r).Where(r => r.Position > fromId).ToList())
+            {
+                item.Position -= 1;
+            }
+
+            resourcesDataGrid.ItemsSource = StaticHolder.SelectedResources[SelectedPatient.PatientId].OrderBy(r => r.Position).ToList();
+        }
+        #endregion
+
+        #region Targets listbox
+        private void addToMaskWindow_OnTargetListUpdated()
+        {
+            if (SelectedPatient == null)
+                return;
+
+            targetsDataGrid.ItemsSource = StaticHolder.SelectedTargets[SelectedPatient.PatientId];
+        }
+
+        private void targetsListBoxItemUP_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedTarget = (targetsDataGrid.SelectedItem as Target);
+
+            if (selectedTarget == null)
+                return;
+
+            int currentItemPosition = selectedTarget.Position;
+
+            if (currentItemPosition == 0)
+            {
+                return;
+            }
+
+            var itemOnPositionAbove = (targetsDataGrid.Items[currentItemPosition - 1] as Target);
+
+            selectedTarget.Position -= 1;
+
+            if (itemOnPositionAbove == null)
+                return;
+
+            itemOnPositionAbove.Position += 1;
+
+            targetsDataGrid.ItemsSource = StaticHolder.SelectedTargets[SelectedPatient.PatientId].OrderBy(t => t.Position).ToList();
+        }
+
+        private void targetsListBoxItemDown_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedTarget = (targetsDataGrid.SelectedItem as Target);
+
+            if (selectedTarget == null)
+                return;
+
+            int currentItemPosition = selectedTarget.Position;
+
+            if (currentItemPosition == targetsDataGrid.Items.Count - 1)
+            {
+                return;
+            }
+
+            var itemOnPositionAbove = (targetsDataGrid.Items[currentItemPosition + 1] as Target);
+
+            selectedTarget.Position += 1;
+
+            if (itemOnPositionAbove == null)
+                return;
+
+            itemOnPositionAbove.Position -= 1;
+
+            targetsDataGrid.ItemsSource = StaticHolder.SelectedTargets[SelectedPatient.PatientId].OrderBy(t => t.Position).ToList();
+        }
+
+        private void targetsListBoxItemDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedTarget = (targetsDataGrid.SelectedItem as Target);
+
+            if (selectedTarget == null)
+                return;
+
+            StaticHolder.SelectedTargets[SelectedPatient.PatientId].Remove(selectedResource);
+            UpdateTargetsPositions(selectedResource.Position);
+        }
+
+        private void UpdateTargetsPositions(int fromId)
+        {
+            if (SelectedPatient == null)
+                return;
+
+            foreach (var item in StaticHolder.SelectedTargets[SelectedPatient.PatientId].Select(t => t).Where(t => t.Position > fromId).ToList())
+            {
+                item.Position -= 1;
+            }
+
+            targetsDataGrid.ItemsSource = StaticHolder.SelectedTargets[SelectedPatient.PatientId].OrderBy(t => t.Position).ToList();
         }
         #endregion
     }

@@ -21,14 +21,20 @@ namespace PflegedientPlan
     /// </summary>
     public partial class AddToMask : Window
     {
-        public delegate void NewProblemAddedToMain();
-        public event NewProblemAddedToMain OnProblemListUpdated;
+        public delegate void NewItemAddedToMain();
+        public event NewItemAddedToMain OnProblemListUpdated;
+        public event NewItemAddedToMain OnResourceListUpdated;
+        public event NewItemAddedToMain OnTargetListUpdated;
+        public event NewItemAddedToMain OnMeasureListUpdated;
 
         private Patient SelectedPatient { get; set; }
         private Activity SelectedActivity { get; set; }
         private Category SelectedCategory { get; set; }
 
         private readonly ObservableCollection<Problem> _problemsList = new ObservableCollection<Problem>();
+        private readonly ObservableCollection<Resource> _resourcesList = new ObservableCollection<Resource>();
+        private readonly ObservableCollection<Target> _targetsList = new ObservableCollection<Target>();
+        private readonly ObservableCollection<Measure> _measuresList = new ObservableCollection<Measure>();
 
         public AddToMask(Patient patient, Activity activity, Category category)
         {
@@ -40,27 +46,106 @@ namespace PflegedientPlan
             Init();
         }
 
+        #region Init
         private async void Init()
         {
             await LoadProblemsAsync();
-            LoadSelectedProblems();
+            await LoadResourcesAsync();
+
+            // check if patient already got a list
+            if (!StaticHolder.SelectedProblems.ContainsKey(SelectedPatient.PatientId))
+            {
+                StaticHolder.SelectedProblems.Add(SelectedPatient.PatientId, new ObservableCollection<Problem>());
+            }
+
+            if (!StaticHolder.SelectedResources.ContainsKey(SelectedPatient.PatientId))
+            {
+                StaticHolder.SelectedResources.Add(SelectedPatient.PatientId, new ObservableCollection<Resource>());
+            }
+
+            if (!StaticHolder.SelectedTargets.ContainsKey(SelectedPatient.PatientId))
+            {
+                StaticHolder.SelectedTargets.Add(SelectedPatient.PatientId, new ObservableCollection<Target>());
+            }
+
+            if (!StaticHolder.SelectedMeasures.ContainsKey(SelectedPatient.PatientId))
+            {
+                StaticHolder.SelectedMeasures.Add(SelectedPatient.PatientId, new ObservableCollection<Measure>());
+            }
+
+            await Task.Run(() =>
+            {
+                LoadSelectedProblems();
+                LoadSelectedResources();
+                LoadSelectedTargets();
+                LoadSelectedMeasures();
+            });
         }
 
-        private async void LoadSelectedProblems()
+        private void LoadSelectedProblems()
         {
-                if (StaticHolder.SelectedProblems.Count > 0)
+            if (StaticHolder.SelectedProblems[SelectedPatient.PatientId].Count > 0)
+            {
+                foreach (var problem in StaticHolder.SelectedProblems[SelectedPatient.PatientId])
                 {
-                    foreach (var problem in StaticHolder.SelectedProblems)
-                    {
-                        var item = (_problemsList.Select(p => p).Where(p => p.Id == problem.Id).FirstOrDefault());
+                    var item = (_problemsList.Select(p => p).Where(p => p.Id == problem.Id).FirstOrDefault());
 
-                        if (item != null)
-                        {
-                            item.IsChecked = true;
-                        }
+                    if (item != null)
+                    {
+                        item.IsChecked = true;
                     }
                 }
+            }
         }
+
+        private void LoadSelectedResources()
+        {
+            if (StaticHolder.SelectedResources[SelectedPatient.PatientId].Count > 0)
+            {
+                foreach (var resource in StaticHolder.SelectedResources[SelectedPatient.PatientId])
+                {
+                    var item = (_resourcesList.Select(p => p).Where(p => p.Id == resource.Id).FirstOrDefault());
+
+                    if (item != null)
+                    {
+                        item.IsChecked = true;
+                    }
+                }
+            }
+        }
+
+        public void LoadSelectedTargets()
+        {
+            if (StaticHolder.SelectedTargets[SelectedPatient.PatientId].Count > 0)
+            {
+                foreach (var target in StaticHolder.SelectedTargets[SelectedPatient.PatientId])
+                {
+                    var item = (_targetsList.Select(t => t).Where(t => t.Id == target.Id).FirstOrDefault());
+
+                    if (item != null)
+                    {
+                        item.IsChecked = true;
+                    }
+                }
+            }
+        }
+
+        public void LoadSelectedMeasures()
+        {
+            if (StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Count > 0)
+            {
+                foreach (var measure in StaticHolder.SelectedMeasures[SelectedPatient.PatientId])
+                {
+                    var item = (_measuresList.Select(m => m).Where(m => m.Id == measure.Id).FirstOrDefault());
+
+                    if (item != null)
+                    {
+                        item.IsChecked = true;
+                    }
+                }
+            }
+        }
+        #endregion
 
         #region Load problems async
         private async Task LoadProblemsAsync()
@@ -71,7 +156,9 @@ namespace PflegedientPlan
             {
                 if (await client.OpenConnectionAsync())
                 {
-                    using (var reader = await client.SelectAsync("SELECT * FROM problems;"))
+                    client.AddParam<int>("@activity_id", SelectedActivity.Id);
+
+                    using (var reader = await client.SelectAsync("SELECT * FROM problems WHERE activity_id = @activity_id;"))
                     {
                         if (reader.HasRows)
                         {
@@ -93,11 +180,98 @@ namespace PflegedientPlan
                             }
                         }
                     }
+
+                    client.ClearParameter();
                 }
             }
-
             problemsListBox.ItemsSource = _problemsList;
         }
+        #endregion
+
+        #region Load resources async
+        private async Task LoadResourcesAsync()
+        {
+            _resourcesList.Clear();
+
+            using (var client = new DatabaseClient())
+            {
+                if (await client.OpenConnectionAsync())
+                {
+                    client.AddParam<int>("@activity_id", SelectedActivity.Id);
+
+                    using (var reader = await client.SelectAsync("SELECT * FROM resources WHERE activity_id = @activity_id;"))
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var resource = new Resource()
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Position = reader.GetInt32(1),
+                                    Description = reader.GetString(2),
+                                    IsChecked = false
+                                };
+
+                                resource.Description = ReplacePlaceholder(resource.Description);
+
+                                _resourcesList.Add(resource);
+                                var realIndex = _resourcesList.IndexOf(resource);
+                                _resourcesList.ElementAt(realIndex).RealListIndex = realIndex;
+                            }
+                        }
+                    }
+
+                    client.ClearParameter();
+                }
+            }
+            resourcesListBox.ItemsSource = _resourcesList;
+        }
+        #endregion
+
+        #region Load targets async
+        private async Task LoadTargetsAsync()
+        {
+            _targetsList.Clear();
+
+            using (var client = new DatabaseClient())
+            {
+                if (await client.OpenConnectionAsync())
+                {
+                    client.AddParam<int>("@activity_id", SelectedActivity.Id);
+
+                    using (var reader = await client.SelectAsync("SELECT * FROM targets WHERE activity_id = @activity_id;"))
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var target = new Target()
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Position = reader.GetInt32(1),
+                                    Description = reader.GetString(2),
+                                    IsChecked = false
+                                };
+
+                                target.Description = ReplacePlaceholder(target.Description);
+
+                                _targetsList.Add(target);
+                                var realIndex = _targetsList.IndexOf(target);
+                                _targetsList.ElementAt(realIndex).RealListIndex = realIndex;
+                            }
+                        }
+                    }
+
+                    client.ClearParameter();
+                }
+            }
+            targetsList.ItemsSource = _targetsList;
+        }
+        #endregion
+
+        #region Load measures async
+
         #endregion
 
         #region Add new problem to database
@@ -113,7 +287,8 @@ namespace PflegedientPlan
                     {
                         client.AddParam<int>("@pos", 0);
                         client.AddParam<string>("@desc", description);
-                        client.ExecuteAsync("INSERT INTO problems (position, description) VALUES (@pos, @desc);");
+                        client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                        client.ExecuteAsync("INSERT INTO problems (position, description, activity_id) VALUES (@pos, @desc, @activity_id);");
                         client.ClearParameter();
                     }
                 }
@@ -126,16 +301,70 @@ namespace PflegedientPlan
         }
         #endregion
 
+        #region Add new resource to database
+        private async void addNewResourceBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var description = newResourceTextBox.Text;
+
+            if (!string.IsNullOrEmpty(description))
+            {
+                using (var client = new DatabaseClient())
+                {
+                    if (await client.OpenConnectionAsync())
+                    {
+                        client.AddParam<int>("@pos", 0);
+                        client.AddParam<string>("@desc", description);
+                        client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                        client.ExecuteAsync("INSERT INTO resources (position, description, activity_id) VALUES (@pos, @desc, @activity_id);");
+                        client.ClearParameter();
+                    }
+                }
+
+                newResourceTextBox.Text = "";
+                await LoadResourcesAsync();
+                LoadSelectedResources();
+            }
+        }
+        #endregion
+
+        #region Add new target to database
+        private async void addNewTargetBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var description = newTargetTextBox.Text;
+
+            if (!string.IsNullOrEmpty(description))
+            {
+                using (var client = new DatabaseClient())
+                {
+                    if (await client.OpenConnectionAsync())
+                    {
+                        client.AddParam<int>("@pos", 0);
+                        client.AddParam<string>("@desc", description);
+                        client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                        client.ExecuteAsync("INSERT INTO targets (position, description, activity_id) VALUES (@pos, @desc, @activity_id);");
+                        client.ClearParameter();
+                    }
+                }
+
+                newTargetTextBox.Text = "";
+                await LoadTargetsAsync();
+                LoadSelectedTargets();
+            }
+        }
+        #endregion
+
+        #region Add new measure to database
+        #endregion
+
         #region Replace placeholder in string
         private string ReplacePlaceholder(string description)
         {
             var temp = description;
             string newDescription;
 
-            newDescription = temp.Replace("%name%", SelectedPatient.PatientVorname + " " + SelectedPatient.PatientNachname)
-                .Replace("%vorname%", SelectedPatient.PatientVorname)
-                .Replace("%nachname%", SelectedPatient.PatientNachname)
-                .Replace("%anrede%", (SelectedPatient.PatientGender == Gender.MALE) ? "Herr" : "Frau");
+            var anrede = ((SelectedPatient.PatientGender == Gender.MALE) ? "Herr" : "Frau") + " " + SelectedPatient.PatientNachname;
+
+            newDescription = temp.Replace("$", anrede);
 
             return newDescription;
         }
@@ -154,13 +383,13 @@ namespace PflegedientPlan
             if (problem == null)
                 return;
 
-            var exists = StaticHolder.SelectedProblems.Select(p => p).Where(p => p.Id == problem.Id).ToList();
+            var exists = StaticHolder.SelectedProblems[SelectedPatient.PatientId].Select(p => p).Where(p => p.Id == problem.Id).ToList();
 
             if (exists.Count <= 0)
             {
                 problem.IsChecked = true;
-                problem.Position = StaticHolder.SelectedProblems.Count;
-                StaticHolder.SelectedProblems.Add(problem);
+                problem.Position = StaticHolder.SelectedProblems[SelectedPatient.PatientId].Count;
+                StaticHolder.SelectedProblems[SelectedPatient.PatientId].Add(problem);
             }
 
             OnProblemListUpdated.Invoke();
@@ -178,16 +407,115 @@ namespace PflegedientPlan
             if (problem == null)
                 return;
 
-            var probToRemove = StaticHolder.SelectedProblems.Select(p => p).Where(p => p.Id == problem.Id).FirstOrDefault();
+            var probToRemove = StaticHolder.SelectedProblems[SelectedPatient.PatientId].Select(p => p).Where(p => p.Id == problem.Id).FirstOrDefault();
 
             if (probToRemove == null)
                 return;
 
             probToRemove.IsChecked = false;
-            StaticHolder.SelectedProblems.Remove(probToRemove);
+            StaticHolder.SelectedProblems[SelectedPatient.PatientId].Remove(probToRemove);
 
             OnProblemListUpdated.Invoke();
         }
+        #endregion
+
+        #region Resource Check / Uncheck
+        private void OnResourceChecked(object sender, RoutedEventArgs e)
+        {
+            var checkBoxObj = (sender as CheckBox);
+
+            if (checkBoxObj == null)
+                return;
+
+            var resource = _resourcesList.Select(r => r).Where(r => r.Description == checkBoxObj.Content.ToString()).FirstOrDefault();
+
+            if (resource == null)
+                return;
+
+            var exists = StaticHolder.SelectedResources[SelectedPatient.PatientId].Select(r => r).Where(r => r.Id == resource.Id).ToList();
+
+            if (exists.Count <= 0)
+            {
+                resource.IsChecked = true;
+                resource.Position = StaticHolder.SelectedResources[SelectedPatient.PatientId].Count;
+                StaticHolder.SelectedResources[SelectedPatient.PatientId].Add(resource);
+            }
+
+            OnResourceListUpdated.Invoke();
+        }
+        private void OnResourceUnchecked(object sender, RoutedEventArgs e)
+        {
+            var checkBoxObj = (sender as CheckBox);
+
+            if (checkBoxObj == null)
+                return;
+
+            var resource = _resourcesList.Select(r => r).Where(r => r.Description == checkBoxObj.Content.ToString()).FirstOrDefault();
+
+            if (resource == null)
+                return;
+
+            var resToRemove = StaticHolder.SelectedResources[SelectedPatient.PatientId].Select(r => r).Where(r => r.Id == resource.Id).FirstOrDefault();
+
+            if (resToRemove == null)
+                return;
+
+            resToRemove.IsChecked = false;
+            StaticHolder.SelectedResources[SelectedPatient.PatientId].Remove(resToRemove);
+            OnResourceListUpdated.Invoke();
+        }
+        #endregion
+
+        #region Target Check / Uncheck
+        private void OnTargetChecked(object sender, RoutedEventArgs e)
+        {
+            var checkBoxObj = (sender as CheckBox);
+
+            if (checkBoxObj == null)
+                return;
+
+            var target = _targetsList.Select(t => t).Where(t => t.Description == checkBoxObj.Content.ToString()).FirstOrDefault();
+
+            if (target == null)
+                return;
+
+            var exists = StaticHolder.SelectedTargets[SelectedPatient.PatientId].Select(t => t).Where(t => t.Id == target.Id).ToList();
+
+            if (exists.Count <= 0)
+            {
+                target.IsChecked = true;
+                target.Position = StaticHolder.SelectedTargets[SelectedPatient.PatientId].Count;
+                StaticHolder.SelectedTargets[SelectedPatient.PatientId].Add(target);
+            }
+
+            OnTargetListUpdated.Invoke();
+        }
+        private void OnTargetUnchecked(object sender, RoutedEventArgs e)
+        {
+            var checkBoxObj = (sender as CheckBox);
+
+            if (checkBoxObj == null)
+                return;
+
+            var target = _targetsList.Select(t => t).Where(t => t.Description == checkBoxObj.Content.ToString()).FirstOrDefault();
+
+            if (target == null)
+                return;
+
+            var tarToRemove = StaticHolder.SelectedTargets[SelectedPatient.PatientId].Select(t => t).Where(t => t.Id == target.Id).FirstOrDefault();
+
+            if (tarToRemove == null)
+                return;
+
+            tarToRemove.IsChecked = false;
+            StaticHolder.SelectedTargets[SelectedPatient.PatientId].Remove(tarToRemove);
+
+            OnTargetListUpdated.Invoke();
+        }
+        #endregion
+
+        #region Measure Check / Uncheck
+
         #endregion
     }
 }

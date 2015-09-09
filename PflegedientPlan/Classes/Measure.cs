@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PflegedientPlan.Classes
 {
-    public class Problem
+    public class Measure
     {
         public int Id { get; set; }
         public int Position { get; set; }

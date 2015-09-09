@@ -48,6 +48,12 @@ namespace PflegedientPlan
         {
             using (var command = new SqlCommand(query, _connection))
             {
+                foreach (var param in _parameter)
+                {
+                    if (!command.Parameters.Contains(param))
+                        command.Parameters.Add(param);
+                }
+
                 return await command.ExecuteReaderAsync();
             }
         }
