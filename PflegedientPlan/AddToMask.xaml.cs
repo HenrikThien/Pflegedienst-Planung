@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,6 +52,7 @@ namespace PflegedientPlan
         {
             await LoadProblemsAsync();
             await LoadResourcesAsync();
+            await LoadTargetsAsync();
 
             // check if patient already got a list
             if (!StaticHolder.SelectedProblems.ContainsKey(SelectedPatient.PatientId))
@@ -72,78 +74,84 @@ namespace PflegedientPlan
             {
                 StaticHolder.SelectedMeasures.Add(SelectedPatient.PatientId, new ObservableCollection<Measure>());
             }
+        }
 
+        private async Task LoadSelectedProblems()
+        {
             await Task.Run(() =>
             {
-                LoadSelectedProblems();
-                LoadSelectedResources();
-                LoadSelectedTargets();
-                LoadSelectedMeasures();
+                if (StaticHolder.SelectedProblems[SelectedPatient.PatientId].Count > 0)
+                {
+                    foreach (var problem in StaticHolder.SelectedProblems[SelectedPatient.PatientId])
+                    {
+                        Debug.WriteLine(problem.Description);
+
+                        var item = (_problemsList.Select(p => p).Where(p => p.Id == problem.Id).FirstOrDefault());
+
+                        if (item != null)
+                        {
+                            item.IsChecked = true;
+                        }
+                    }
+                }
             });
         }
 
-        private void LoadSelectedProblems()
+        private async Task LoadSelectedResources()
         {
-            if (StaticHolder.SelectedProblems[SelectedPatient.PatientId].Count > 0)
+            await Task.Run(() =>
             {
-                foreach (var problem in StaticHolder.SelectedProblems[SelectedPatient.PatientId])
+                if (StaticHolder.SelectedResources[SelectedPatient.PatientId].Count > 0)
                 {
-                    var item = (_problemsList.Select(p => p).Where(p => p.Id == problem.Id).FirstOrDefault());
-
-                    if (item != null)
+                    foreach (var resource in StaticHolder.SelectedResources[SelectedPatient.PatientId])
                     {
-                        item.IsChecked = true;
+                        var item = (_resourcesList.Select(p => p).Where(p => p.Id == resource.Id).FirstOrDefault());
+
+                        if (item != null)
+                        {
+                            item.IsChecked = true;
+                        }
                     }
                 }
-            }
+            });
         }
 
-        private void LoadSelectedResources()
+        public async Task LoadSelectedTargets()
         {
-            if (StaticHolder.SelectedResources[SelectedPatient.PatientId].Count > 0)
+            await Task.Run(() =>
             {
-                foreach (var resource in StaticHolder.SelectedResources[SelectedPatient.PatientId])
+                if (StaticHolder.SelectedTargets[SelectedPatient.PatientId].Count > 0)
                 {
-                    var item = (_resourcesList.Select(p => p).Where(p => p.Id == resource.Id).FirstOrDefault());
-
-                    if (item != null)
+                    foreach (var target in StaticHolder.SelectedTargets[SelectedPatient.PatientId])
                     {
-                        item.IsChecked = true;
+                        var item = (_targetsList.Select(t => t).Where(t => t.Id == target.Id).FirstOrDefault());
+
+                        if (item != null)
+                        {
+                            item.IsChecked = true;
+                        }
                     }
                 }
-            }
+            });
         }
 
-        public void LoadSelectedTargets()
+        public async Task LoadSelectedMeasures()
         {
-            if (StaticHolder.SelectedTargets[SelectedPatient.PatientId].Count > 0)
+            await Task.Run(() =>
             {
-                foreach (var target in StaticHolder.SelectedTargets[SelectedPatient.PatientId])
+                if (StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Count > 0)
                 {
-                    var item = (_targetsList.Select(t => t).Where(t => t.Id == target.Id).FirstOrDefault());
-
-                    if (item != null)
+                    foreach (var measure in StaticHolder.SelectedMeasures[SelectedPatient.PatientId])
                     {
-                        item.IsChecked = true;
+                        var item = (_measuresList.Select(m => m).Where(m => m.Id == measure.Id).FirstOrDefault());
+
+                        if (item != null)
+                        {
+                            item.IsChecked = true;
+                        }
                     }
                 }
-            }
-        }
-
-        public void LoadSelectedMeasures()
-        {
-            if (StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Count > 0)
-            {
-                foreach (var measure in StaticHolder.SelectedMeasures[SelectedPatient.PatientId])
-                {
-                    var item = (_measuresList.Select(m => m).Where(m => m.Id == measure.Id).FirstOrDefault());
-
-                    if (item != null)
-                    {
-                        item.IsChecked = true;
-                    }
-                }
-            }
+            });
         }
         #endregion
 
@@ -184,6 +192,8 @@ namespace PflegedientPlan
                     client.ClearParameter();
                 }
             }
+
+            await LoadSelectedProblems();
             problemsListBox.ItemsSource = _problemsList;
         }
         #endregion
@@ -225,6 +235,7 @@ namespace PflegedientPlan
                     client.ClearParameter();
                 }
             }
+            await LoadSelectedResources();
             resourcesListBox.ItemsSource = _resourcesList;
         }
         #endregion
@@ -266,7 +277,8 @@ namespace PflegedientPlan
                     client.ClearParameter();
                 }
             }
-            targetsList.ItemsSource = _targetsList;
+            await LoadSelectedTargets();
+            targetsListBox.ItemsSource = _targetsList;
         }
         #endregion
 

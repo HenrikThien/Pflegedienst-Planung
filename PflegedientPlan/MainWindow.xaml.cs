@@ -446,10 +446,10 @@ namespace PflegedientPlan
 
             selectedProblem.Position -= 1;
 
-            if (itemOnPositionAbove == null)
-                return;
-
-            itemOnPositionAbove.Position += 1;
+            if (itemOnPositionAbove != null)
+            {
+                itemOnPositionAbove.Position += 1;
+            }
 
             problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems[SelectedPatient.PatientId].OrderBy(p => p.Position).ToList();
         }
@@ -472,10 +472,10 @@ namespace PflegedientPlan
 
             selectedProblem.Position += 1;
 
-            if (itemOnPositionAbove == null)
-                return;
-
-            itemOnPositionAbove.Position -= 1;
+            if (itemOnPositionAbove != null)
+            {
+                itemOnPositionAbove.Position -= 1;
+            }
 
             problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems[SelectedPatient.PatientId].OrderBy(p => p.Position).ToList();
         }
@@ -532,10 +532,10 @@ namespace PflegedientPlan
 
             selectedResource.Position -= 1;
 
-            if (itemOnPositionAbove == null)
-                return;
-
-            itemOnPositionAbove.Position += 1;
+            if (itemOnPositionAbove != null)
+            {
+                itemOnPositionAbove.Position += 1;
+            }
 
             resourcesDataGrid.ItemsSource = StaticHolder.SelectedResources[SelectedPatient.PatientId].OrderBy(r => r.Position).ToList();
         }
@@ -558,10 +558,10 @@ namespace PflegedientPlan
 
             selectedResource.Position += 1;
 
-            if (itemOnPositionAbove == null)
-                return;
-
-            itemOnPositionAbove.Position -= 1;
+            if (itemOnPositionAbove != null)
+            {
+                itemOnPositionAbove.Position -= 1;
+            }
 
             resourcesDataGrid.ItemsSource = StaticHolder.SelectedResources[SelectedPatient.PatientId].OrderBy(r => r.Position).ToList();
         }
@@ -618,10 +618,10 @@ namespace PflegedientPlan
 
             selectedTarget.Position -= 1;
 
-            if (itemOnPositionAbove == null)
-                return;
-
-            itemOnPositionAbove.Position += 1;
+            if (itemOnPositionAbove != null)
+            {
+                itemOnPositionAbove.Position += 1;
+            }
 
             targetsDataGrid.ItemsSource = StaticHolder.SelectedTargets[SelectedPatient.PatientId].OrderBy(t => t.Position).ToList();
         }
@@ -644,10 +644,10 @@ namespace PflegedientPlan
 
             selectedTarget.Position += 1;
 
-            if (itemOnPositionAbove == null)
-                return;
-
-            itemOnPositionAbove.Position -= 1;
+            if (itemOnPositionAbove != null)
+            {
+                itemOnPositionAbove.Position -= 1;
+            }
 
             targetsDataGrid.ItemsSource = StaticHolder.SelectedTargets[SelectedPatient.PatientId].OrderBy(t => t.Position).ToList();
         }
@@ -659,8 +659,8 @@ namespace PflegedientPlan
             if (selectedTarget == null)
                 return;
 
-            StaticHolder.SelectedTargets[SelectedPatient.PatientId].Remove(selectedResource);
-            UpdateTargetsPositions(selectedResource.Position);
+            StaticHolder.SelectedTargets[SelectedPatient.PatientId].Remove(selectedTarget);
+            UpdateTargetsPositions(selectedTarget.Position);
         }
 
         private void UpdateTargetsPositions(int fromId)
