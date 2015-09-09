@@ -62,7 +62,7 @@ namespace PflegedientPlan
 
             SelectedPatient = patient;
 
-            // reload problemslist
+            // reload lists
             if (!StaticHolder.SelectedProblems.ContainsKey(patient.PatientId))
             {
                 StaticHolder.SelectedProblems.Add(patient.PatientId, new ObservableCollection<Problem>());
@@ -83,6 +83,13 @@ namespace PflegedientPlan
             }
 
             targetsDataGrid.ItemsSource = StaticHolder.SelectedTargets[patient.PatientId];
+
+            if (!StaticHolder.SelectedMeasures.ContainsKey(patient.PatientId))
+            {
+                StaticHolder.SelectedMeasures.Add(patient.PatientId, new ObservableCollection<Measure>());
+            }
+
+            measuresDataGrid.ItemsSource = StaticHolder.SelectedMeasures[patient.PatientId];
         }
 
         #region Init program, load items async
@@ -228,44 +235,79 @@ namespace PflegedientPlan
         #region Add new user to database
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            try
+            if (handlePatientBtn.Content == "Bearbeiten")
             {
                 if (!string.IsNullOrEmpty(patNrBox.Text) && !string.IsNullOrEmpty(patVornameBox.Text) && !string.IsNullOrEmpty(patNachnameBox.Text) && !string.IsNullOrEmpty(patGeburtsDatumBox.Text))
                 {
-                    var patient = new Patient()
-                    {
-                        PatientId = int.Parse(patNrBox.Text),
-                        PatientVorname = patVornameBox.Text,
-                        PatientNachname = patNachnameBox.Text,
-                        PatientGeburtsdatum = patGeburtsDatumBox.Text,
-                        PatientGender = (patGender.SelectedIndex == 0) ? Gender.MALE : Gender.FEMALE
-                    };
+                    var patient = _patientList.Select(p => p).Where(p => p.PatientId == int.Parse(patNrBox.Text)).FirstOrDefault();
 
-                    if (patient.PatientId != null && !string.IsNullOrEmpty(patient.PatientVorname) && !string.IsNullOrEmpty(patient.PatientNachname) && !string.IsNullOrEmpty(patient.PatientGeburtsdatum))
+                    if (patient != null)
                     {
-                        var patientExist = _patientList.Select(p => p).Where(p => p.PatientId == patient.PatientId).FirstOrDefault();
+                        patient.PatientId = int.Parse(patNrBox.Text);
+                        patient.PatientVorname = patVornameBox.Text;
+                        patient.PatientNachname = patNachnameBox.Text;
+                        patient.PatientGeburtsdatum = patGeburtsDatumBox.Text;
+                        patient.PatientGender = (patGender.SelectedIndex == 0) ? Gender.MALE : Gender.FEMALE;
 
-                        if (patientExist != null)
+                        if (patient.PatientId != null && !string.IsNullOrEmpty(patient.PatientVorname) && !string.IsNullOrEmpty(patient.PatientNachname) && !string.IsNullOrEmpty(patient.PatientGeburtsdatum))
                         {
-                            MessageBox.Show("Dieser Patient wurde bereits hinzugefügt! (" + patient.PatientVorname + " " + patient.PatientNachname + ")", "Doppelter Eintrag", MessageBoxButton.OK, MessageBoxImage.Error);
-                            return;
+
+                            await UpdatePatientInDatabase(patient);
+                            userGrid.ItemsSource = _patientList;
+
+                            patNrBox.Text = "";
+                            patVornameBox.Text = "";
+                            patNachnameBox.Text = "";
+                            patGeburtsDatumBox.Text = "";
+                            patGender.SelectedIndex = 0;
+
+                            handlePatientBtn.Content = "Hinzufügen";
                         }
-
-                        await AddPatientToDatabase(patient);
-
-                        _patientList.Add(patient);
-                        userGrid.ItemsSource = _patientList;
-
-                        patNrBox.Text = "";
-                        patVornameBox.Text = "";
-                        patNachnameBox.Text = "";
-                        patGeburtsDatumBox.Text = "";
                     }
                 }
             }
-            catch (Exception ex)
+            else if (handlePatientBtn.Content == "Hinzufügen")
             {
-                WriteException(ex);
+                try
+                {
+                    if (!string.IsNullOrEmpty(patNrBox.Text) && !string.IsNullOrEmpty(patVornameBox.Text) && !string.IsNullOrEmpty(patNachnameBox.Text) && !string.IsNullOrEmpty(patGeburtsDatumBox.Text))
+                    {
+                        var patient = new Patient()
+                        {
+                            PatientId = int.Parse(patNrBox.Text),
+                            PatientVorname = patVornameBox.Text,
+                            PatientNachname = patNachnameBox.Text,
+                            PatientGeburtsdatum = patGeburtsDatumBox.Text,
+                            PatientGender = (patGender.SelectedIndex == 0) ? Gender.MALE : Gender.FEMALE
+                        };
+
+                        if (patient.PatientId != null && !string.IsNullOrEmpty(patient.PatientVorname) && !string.IsNullOrEmpty(patient.PatientNachname) && !string.IsNullOrEmpty(patient.PatientGeburtsdatum))
+                        {
+                            var patientExist = _patientList.Select(p => p).Where(p => p.PatientId == patient.PatientId).FirstOrDefault();
+
+                            if (patientExist != null)
+                            {
+                                MessageBox.Show("Dieser Patient wurde bereits hinzugefügt! (" + patient.PatientVorname + " " + patient.PatientNachname + ")", "Doppelter Eintrag", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
+                            }
+
+                            await AddPatientToDatabase(patient);
+
+                            _patientList.Add(patient);
+                            userGrid.ItemsSource = _patientList;
+
+                            patNrBox.Text = "";
+                            patVornameBox.Text = "";
+                            patNachnameBox.Text = "";
+                            patGeburtsDatumBox.Text = "";
+                            patGender.SelectedIndex = 0;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    WriteException(ex);
+                }
             }
         }
         #endregion
@@ -288,6 +330,23 @@ namespace PflegedientPlan
                     client.AddParam<int>("@gender", (int)patient.PatientGender);
 
                     var state = await client.InsertAsync("INSERT INTO patienten (pat_nr, pat_vorname, pat_nachname, pat_geburtsdatum, pat_gender) VALUES (@patnr, @vorname, @nachname, @gebdat, @gender);");
+                }
+            }
+        }
+
+        private async Task UpdatePatientInDatabase(Patient patient)
+        {
+            using (var client = new DatabaseClient())
+            {
+                if (await client.OpenConnectionAsync())
+                {
+                    client.AddParam<int>("@patnr", patient.PatientId);
+                    client.AddParam<string>("@vorname", patient.PatientVorname);
+                    client.AddParam<string>("@nachname", patient.PatientNachname);
+                    client.AddParam<string>("@gebdat", patient.PatientGeburtsdatum);
+                    client.AddParam<int>("@gender", (int)patient.PatientGender);
+
+                    var state = await client.InsertAsync("UPDATE patienten SET pat_nr = @patnr, pat_vorname = @vorname, pat_nachname = @nachname, pat_geburtsdatum = @gebdat, pat_gender = @gender WHERE pat_nr = @patnr;");
                 }
             }
         }
@@ -349,6 +408,22 @@ namespace PflegedientPlan
             {
                 await DeletePatientAsync(selectedPatient);
             }
+        }
+
+        private async void contextMenuEditPatient_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedPatient = (userGrid.SelectedItem as Patient);
+
+            if (selectedPatient == null)
+                return;
+
+            handlePatientBtn.Content = "Bearbeiten";
+
+            patNrBox.Text = selectedPatient.PatientId.ToString();
+            patVornameBox.Text = selectedPatient.PatientVorname;
+            patNachnameBox.Text = selectedPatient.PatientNachname;
+            patGeburtsDatumBox.Text = selectedPatient.PatientGeburtsdatum;
+            patGender.SelectedIndex = (selectedPatient.PatientGender == Gender.MALE) ? 0 : 1;
         }
 
         private async Task DeletePatientAsync(Patient patient)
@@ -416,6 +491,7 @@ namespace PflegedientPlan
             addToMaskWindow.OnProblemListUpdated += addToMaskWindow_OnProblemListUpdated;
             addToMaskWindow.OnResourceListUpdated += addToMaskWindow_OnResourceListUpdated;
             addToMaskWindow.OnTargetListUpdated += addToMaskWindow_OnTargetListUpdated;
+            addToMaskWindow.OnMeasureListUpdated += addToMaskWindow_OnMeasureListUpdated;
             addToMaskWindow.Show();
         }
 
@@ -674,6 +750,92 @@ namespace PflegedientPlan
             }
 
             targetsDataGrid.ItemsSource = StaticHolder.SelectedTargets[SelectedPatient.PatientId].OrderBy(t => t.Position).ToList();
+        }
+        #endregion
+
+        #region Measures listbox
+        private void addToMaskWindow_OnMeasureListUpdated()
+        {
+            if (SelectedPatient == null)
+                return;
+
+            measuresDataGrid.ItemsSource = StaticHolder.SelectedMeasures[SelectedPatient.PatientId];
+        }
+
+        private void measuresListBoxItemUP_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedMeasure = (measuresDataGrid.SelectedItem as Measure);
+
+            if (selectedMeasure == null)
+                return;
+
+            int currentItemPosition = selectedMeasure.Position;
+
+            if (currentItemPosition == 0)
+            {
+                return;
+            }
+
+            var itemOnPositionAbove = (measuresDataGrid.Items[currentItemPosition - 1] as Measure);
+
+            selectedMeasure.Position -= 1;
+
+            if (itemOnPositionAbove != null)
+            {
+                itemOnPositionAbove.Position += 1;
+            }
+
+            measuresDataGrid.ItemsSource = StaticHolder.SelectedMeasures[SelectedPatient.PatientId].OrderBy(m => m.Position).ToList();
+        }
+
+        private void measuresListBoxItemDown_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedMeasure = (measuresDataGrid.SelectedItem as Measure);
+
+            if (selectedMeasure == null)
+                return;
+
+            int currentItemPosition = selectedMeasure.Position;
+
+            if (currentItemPosition == measuresDataGrid.Items.Count - 1)
+            {
+                return;
+            }
+
+            var itemOnPositionAbove = (measuresDataGrid.Items[currentItemPosition + 1] as Measure);
+
+            selectedMeasure.Position += 1;
+
+            if (itemOnPositionAbove != null)
+            {
+                itemOnPositionAbove.Position -= 1;
+            }
+
+            measuresDataGrid.ItemsSource = StaticHolder.SelectedMeasures[SelectedPatient.PatientId].OrderBy(m => m.Position).ToList();
+        }
+
+        private void measuresListBoxItemDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedMeasure = (measuresDataGrid.SelectedItem as Measure);
+
+            if (selectedMeasure == null)
+                return;
+
+            StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Remove(selectedMeasure);
+            UpdateMeasuresPositions(selectedMeasure.Position);
+        }
+
+        private void UpdateMeasuresPositions(int fromId)
+        {
+            if (SelectedPatient == null)
+                return;
+
+            foreach (var item in StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Select(m => m).Where(m => m.Position > fromId).ToList())
+            {
+                item.Position -= 1;
+            }
+
+            measuresDataGrid.ItemsSource = StaticHolder.SelectedMeasures[SelectedPatient.PatientId].OrderBy(m => m.Position).ToList();
         }
         #endregion
     }

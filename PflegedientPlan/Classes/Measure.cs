@@ -14,5 +14,6 @@ namespace PflegedientPlan.Classes
         public bool IsChecked { get; set; }
         public int RealListIndex { get; set; }
         public int ActivityId { get; set; }
+        public int Frequency { get; set; }
     }
 }

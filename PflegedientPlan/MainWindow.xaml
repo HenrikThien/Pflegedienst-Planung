@@ -79,7 +79,7 @@
                     <ComboBoxItem Content="Weiblich" />
                 </ComboBox>
 
-                <Button Content="Hinzufügen" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" Height="25" Margin="10" Click="Button_Click" />
+                <Button x:Name="handlePatientBtn" Content="Hinzufügen" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" Height="25" Margin="10" Click="Button_Click" />
             </Grid>
 
             <!-- Program seperator start -->
@@ -103,7 +103,7 @@
                     <ContextMenu>
                         <MenuItem Header="Patienten löschen" Click="contextMenuDeletePatient_Click">
                         </MenuItem>
-                        <MenuItem Header="Patient bearbeiten">
+                        <MenuItem Header="Patient bearbeiten" Click="contextMenuEditPatient_Click">
                         </MenuItem>
                     </ContextMenu>
                 </DataGrid.ContextMenu>
@@ -263,24 +263,24 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="0" Click="measuresListBoxItemUP_Click">
                             <Image Source="Assets/navigate6.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="1" Click="measuresListBoxItemDown_Click">
                             <Image Source="Assets/arrow483.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2">
+                        <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2" Click="measuresListBoxItemDelete_Click">
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
                         <DataGrid x:Name="measuresDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="True" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#Pos." Width="Auto"
-                                    Binding="{Binding PatientId}"/>
+                                    Binding="{Binding Position}"/>
                                 <DataGridTextColumn Header="Maßnahme" Width="*"
-                                    Binding="{Binding PatientVorname}"/>
+                                    Binding="{Binding Description}"/>
                                 <DataGridTextColumn Header="Häufigkeit" Width="Auto"
-                                    Binding="{Binding PatientVorname}"/>
+                                    Binding="{Binding Frequency}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>

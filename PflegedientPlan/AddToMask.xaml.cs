@@ -44,6 +44,13 @@ namespace PflegedientPlan
             SelectedCategory = category;
 
             InitializeComponent();
+
+            for (int i = 1; i <= 200; i++)
+            {
+                measureFrequencyComboBox.Items.Add(i.ToString());
+            }
+            measureFrequencyComboBox.SelectedIndex = 0;
+            
             Init();
         }
 
@@ -53,6 +60,7 @@ namespace PflegedientPlan
             await LoadProblemsAsync();
             await LoadResourcesAsync();
             await LoadTargetsAsync();
+            await LoadMeasuresAsync();
 
             // check if patient already got a list
             if (!StaticHolder.SelectedProblems.ContainsKey(SelectedPatient.PatientId))
@@ -283,7 +291,46 @@ namespace PflegedientPlan
         #endregion
 
         #region Load measures async
+        private async Task LoadMeasuresAsync()
+        {
+            _measuresList.Clear();
 
+            using (var client = new DatabaseClient())
+            {
+                if (await client.OpenConnectionAsync())
+                {
+                    client.AddParam<int>("@activity_id", SelectedActivity.Id);
+
+                    using (var reader = await client.SelectAsync("SELECT * FROM measures WHERE activity_id = @activity_id;"))
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var measure = new Measure()
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Position = reader.GetInt32(1),
+                                    Description = reader.GetString(2),
+                                    IsChecked = false,
+                                    Frequency = reader.GetInt32(4)
+                                };
+
+                                measure.Description = ReplacePlaceholder(measure.Description);
+
+                                _measuresList.Add(measure);
+                                var realIndex = _measuresList.IndexOf(measure);
+                                _measuresList.ElementAt(realIndex).RealListIndex = realIndex;
+                            }
+                        }
+                    }
+
+                    client.ClearParameter();
+                }
+            }
+            await LoadSelectedMeasures();
+            measuresListBox.ItemsSource = _measuresList;
+        }
         #endregion
 
         #region Add new problem to database
@@ -366,6 +413,33 @@ namespace PflegedientPlan
         #endregion
 
         #region Add new measure to database
+        private async void addNewMeasureBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var description = newMeasureTextBox.Text;
+            var frequency = int.Parse(measureFrequencyComboBox.SelectedItem.ToString());
+
+            if (!string.IsNullOrEmpty(description))
+            {
+                using (var client = new DatabaseClient())
+                {
+                    if (await client.OpenConnectionAsync())
+                    {
+                        client.AddParam<int>("@pos", 0);
+                        client.AddParam<string>("@desc", description);
+                        client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                        client.AddParam<int>("@frequency", frequency);
+                        client.ExecuteAsync("INSERT INTO measures (position, description, activity_id, frequency) VALUES (@pos, @desc, @activity_id, @frequency);");
+                        client.ClearParameter();
+                    }
+                }
+
+                newMeasureTextBox.Text = "";
+                measureFrequencyComboBox.SelectedIndex = 0;
+
+                await LoadMeasuresAsync();
+                LoadSelectedMeasures();
+            }
+        }
         #endregion
 
         #region Replace placeholder in string
@@ -527,7 +601,51 @@ namespace PflegedientPlan
         #endregion
 
         #region Measure Check / Uncheck
+        private void OnMeasureChecked(object sender, RoutedEventArgs e)
+        {
+            var checkBoxObj = (sender as CheckBox);
 
+            if (checkBoxObj == null)
+                return;
+
+            var measure = _measuresList.Select(m => m).Where(m => m.Description == checkBoxObj.Content.ToString()).FirstOrDefault();
+
+            if (measure == null)
+                return;
+
+            var exists = StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Select(m => m).Where(m => m.Id == measure.Id).ToList();
+
+            if (exists.Count <= 0)
+            {
+                measure.IsChecked = true;
+                measure.Position = StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Count;
+                StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Add(measure);
+            }
+
+            OnMeasureListUpdated.Invoke();
+        }
+        private void OnMeasureUnchecked(object sender, RoutedEventArgs e)
+        {
+            var checkBoxObj = (sender as CheckBox);
+
+            if (checkBoxObj == null)
+                return;
+
+            var measure = _measuresList.Select(m => m).Where(m => m.Description == checkBoxObj.Content.ToString()).FirstOrDefault();
+
+            if (measure == null)
+                return;
+
+            var measToRemove = StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Select(m => m).Where(m => m.Id == measure.Id).FirstOrDefault();
+
+            if (measToRemove == null)
+                return;
+
+            measToRemove.IsChecked = false;
+            StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Remove(measToRemove);
+
+            OnMeasureListUpdated.Invoke();
+        }
         #endregion
     }
 }
