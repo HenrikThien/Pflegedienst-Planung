@@ -58,6 +58,16 @@
                     "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
                     "ProductCode" = "8:.NETFramework,Version=v4.5"
                     }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.SqlServer.Express.11.0"
+                    {
+                    "Name" = "8:SQL Server 2012 Express"
+                    "ProductCode" = "8:Microsoft.SqlServer.Express.11.0"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.SqlServer.SqlLocalDB.11.1"
+                    {
+                    "Name" = "8:SQL Server 2012 Express LocalDB"
+                    "ProductCode" = "8:Microsoft.SqlServer.SqlLocalDB.11.1"
+                    }
                 }
             }
         }
@@ -189,15 +199,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Pflegedienst Planung"
-        "ProductCode" = "8:{F1FFF7DF-1D78-4248-877A-10B207769C6A}"
-        "PackageCode" = "8:{995A192F-D864-4320-A88A-E9374D5EA8E1}"
+        "ProductCode" = "8:{6B6AC1FE-2235-4348-8E22-3BBE801BA3E5}"
+        "PackageCode" = "8:{E08A459B-85AE-4099-80EA-C6F4A38C0322}"
         "UpgradeCode" = "8:{6ADD5C24-F811-4DAF-88F6-03E0291E8D0F}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:01.33.700"
+        "ProductVersion" = "8:11.33.7777"
         "Manufacturer" = "8:VIS VITALIS"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -481,7 +491,7 @@
                 {
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_99FAB2B0FA444C989089037D5864F41C"
                     {
-                    "Sequence" = "3:210"
+                    "Sequence" = "3:110"
                     "DisplayName" = "8:Customer Information"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
@@ -508,7 +518,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:2"
                             "Setting" = "3:2"
-                            "Value" = "8:<^^%#^ - ^^^^^ - ^%%%^ - ^%^%% - ^%^^^>"
+                            "Value" = "8:<%%%%-^^^^-%%%%>"
                             "DefaultValue" = "8:<###-%%%%%%%>"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -534,7 +544,7 @@
                             "ContextData" = "8:1;True=1;False=0"
                             "Attributes" = "3:0"
                             "Setting" = "3:0"
-                            "Value" = "3:0"
+                            "Value" = "3:1"
                             "DefaultValue" = "3:0"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -542,7 +552,7 @@
                     }
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_DDBA606466BA42369BCE7C6436FF9D74"
                     {
-                    "Sequence" = "3:300"
+                    "Sequence" = "3:200"
                     "DisplayName" = "8:Confirm Installation"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"

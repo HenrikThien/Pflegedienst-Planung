@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,7 +25,6 @@ namespace PflegedientPlan
             _parameter = new List<SqlParameter>();
         }
 
-
         public async Task<bool> OpenConnectionAsync()
         {
             try
@@ -35,6 +35,7 @@ namespace PflegedientPlan
             catch(Exception ex)
             {
                 MessageBox.Show("Es konnte keine Datenbankverbindung hergestellt werden.\nDie Anwendung funktioniert möglicherweiße nicht richtig.");
+                WriteException(ex);
                 return false;
             }
         }

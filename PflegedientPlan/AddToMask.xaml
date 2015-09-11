@@ -115,7 +115,7 @@
                         <ListBox x:Name="measuresListBox" ItemsSource="{Binding}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <CheckBox Content="{Binding Description}" IsChecked="{Binding IsChecked}"  Margin="5 5 0 0" Checked="OnMeasureChecked" Unchecked="OnMeasureUnchecked" />
+                                    <CheckBox Content="{Binding DescriptionString}" IsChecked="{Binding IsChecked}"  Margin="5 5 0 0" Checked="OnMeasureChecked" Unchecked="OnMeasureUnchecked" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
@@ -127,12 +127,17 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <Label Content="Neue Maßnahme hinzufügen:" Grid.Column="0" Margin="5" VerticalAlignment="Center" />
                         <TextBox x:Name="newMeasureTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="1" Margin="5" />
                         <ComboBox x:Name="measureFrequencyComboBox" Margin="5" Grid.Column="2" />
-                        <Button x:Name="addNewMeasureBtn" Grid.Column="3" Content="Hinzufügen" Margin="5" Click="addNewMeasureBtn_Click" />
+                        <ComboBox x:Name="measureFrequencyType" Margin="5" Grid.Column="3" SelectedIndex="0">
+                            <ComboBoxItem>T</ComboBoxItem>
+                            <ComboBoxItem>W</ComboBoxItem>
+                        </ComboBox>
+                        <Button x:Name="addNewMeasureBtn" Grid.Column="4" Content="Hinzufügen" Margin="5" Click="addNewMeasureBtn_Click" />
                     </Grid>
                 </Grid>
             </TabItem>

@@ -24,10 +24,8 @@ namespace PflegedientPlan
 
         public async static Task WriteException(string exception)
         {
-            await Task.Run(() =>
-            {
-                File.AppendAllText(ERROR_FILE, exception + Environment.NewLine);
-            });
+            await InitAsync();
+            await Task.Run(() => File.AppendAllText(ERROR_FILE, exception + Environment.NewLine));
         }
     }
 }

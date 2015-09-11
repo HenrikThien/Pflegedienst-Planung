@@ -45,7 +45,7 @@ namespace PflegedientPlan
 
             InitializeComponent();
 
-            for (int i = 1; i <= 200; i++)
+            for (int i = 1; i <= 20; i++)
             {
                 measureFrequencyComboBox.Items.Add(i.ToString());
             }
@@ -173,8 +173,9 @@ namespace PflegedientPlan
                 if (await client.OpenConnectionAsync())
                 {
                     client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                    client.AddParam<int>("@category_id", SelectedCategory.Id);
 
-                    using (var reader = await client.SelectAsync("SELECT * FROM problems WHERE activity_id = @activity_id;"))
+                    using (var reader = await client.SelectAsync("SELECT * FROM problems WHERE activity_id = @activity_id AND category_id = @category_id;"))
                     {
                         if (reader.HasRows)
                         {
@@ -216,8 +217,9 @@ namespace PflegedientPlan
                 if (await client.OpenConnectionAsync())
                 {
                     client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                    client.AddParam<int>("@category_id", SelectedCategory.Id);
 
-                    using (var reader = await client.SelectAsync("SELECT * FROM resources WHERE activity_id = @activity_id;"))
+                    using (var reader = await client.SelectAsync("SELECT * FROM resources WHERE activity_id = @activity_id AND category_id = @category_id;"))
                     {
                         if (reader.HasRows)
                         {
@@ -258,8 +260,9 @@ namespace PflegedientPlan
                 if (await client.OpenConnectionAsync())
                 {
                     client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                    client.AddParam<int>("@category_id", SelectedCategory.Id);
 
-                    using (var reader = await client.SelectAsync("SELECT * FROM targets WHERE activity_id = @activity_id;"))
+                    using (var reader = await client.SelectAsync("SELECT * FROM targets WHERE activity_id = @activity_id AND category_id = @category_id;"))
                     {
                         if (reader.HasRows)
                         {
@@ -300,8 +303,9 @@ namespace PflegedientPlan
                 if (await client.OpenConnectionAsync())
                 {
                     client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                    client.AddParam<int>("@category_id", SelectedCategory.Id);
 
-                    using (var reader = await client.SelectAsync("SELECT * FROM measures WHERE activity_id = @activity_id;"))
+                    using (var reader = await client.SelectAsync("SELECT * FROM measures WHERE activity_id = @activity_id AND category_id = @category_id;"))
                     {
                         if (reader.HasRows)
                         {
@@ -313,7 +317,8 @@ namespace PflegedientPlan
                                     Position = reader.GetInt32(1),
                                     Description = reader.GetString(2),
                                     IsChecked = false,
-                                    Frequency = reader.GetInt32(4)
+                                    Frequency = reader.GetInt32(4),
+                                    FrequencyType = (FrequencyType)reader.GetInt32(6)
                                 };
 
                                 measure.Description = ReplacePlaceholder(measure.Description);
@@ -347,7 +352,8 @@ namespace PflegedientPlan
                         client.AddParam<int>("@pos", 0);
                         client.AddParam<string>("@desc", description);
                         client.AddParam<int>("@activity_id", SelectedActivity.Id);
-                        client.ExecuteAsync("INSERT INTO problems (position, description, activity_id) VALUES (@pos, @desc, @activity_id);");
+                        client.AddParam<int>("@category_id", SelectedCategory.Id);
+                        client.ExecuteAsync("INSERT INTO problems (position, description, activity_id, category_id) VALUES (@pos, @desc, @activity_id, @category_id);");
                         client.ClearParameter();
                     }
                 }
@@ -374,7 +380,8 @@ namespace PflegedientPlan
                         client.AddParam<int>("@pos", 0);
                         client.AddParam<string>("@desc", description);
                         client.AddParam<int>("@activity_id", SelectedActivity.Id);
-                        client.ExecuteAsync("INSERT INTO resources (position, description, activity_id) VALUES (@pos, @desc, @activity_id);");
+                        client.AddParam<int>("@category_id", SelectedCategory.Id);
+                        client.ExecuteAsync("INSERT INTO resources (position, description, activity_id, category_id) VALUES (@pos, @desc, @activity_id, @category_id);");
                         client.ClearParameter();
                     }
                 }
@@ -400,7 +407,8 @@ namespace PflegedientPlan
                         client.AddParam<int>("@pos", 0);
                         client.AddParam<string>("@desc", description);
                         client.AddParam<int>("@activity_id", SelectedActivity.Id);
-                        client.ExecuteAsync("INSERT INTO targets (position, description, activity_id) VALUES (@pos, @desc, @activity_id);");
+                        client.AddParam<int>("@category_id", SelectedCategory.Id);
+                        client.ExecuteAsync("INSERT INTO targets (position, description, activity_id, category_id) VALUES (@pos, @desc, @activity_id, @category_id);");
                         client.ClearParameter();
                     }
                 }
@@ -428,13 +436,17 @@ namespace PflegedientPlan
                         client.AddParam<string>("@desc", description);
                         client.AddParam<int>("@activity_id", SelectedActivity.Id);
                         client.AddParam<int>("@frequency", frequency);
-                        client.ExecuteAsync("INSERT INTO measures (position, description, activity_id, frequency) VALUES (@pos, @desc, @activity_id, @frequency);");
+                        client.AddParam<int>("@category_id", SelectedCategory.Id);
+                        client.AddParam<int>("@frequency_type", (measureFrequencyType.SelectedIndex == 0) ? 1 : 2);
+
+                        client.ExecuteAsync("INSERT INTO measures (position, description, activity_id, frequency, category_id, type) VALUES (@pos, @desc, @activity_id, @frequency, @category_id, @frequency_type);");
                         client.ClearParameter();
                     }
                 }
 
                 newMeasureTextBox.Text = "";
                 measureFrequencyComboBox.SelectedIndex = 0;
+                measureFrequencyType.SelectedIndex = 0;
 
                 await LoadMeasuresAsync();
                 LoadSelectedMeasures();
@@ -608,7 +620,7 @@ namespace PflegedientPlan
             if (checkBoxObj == null)
                 return;
 
-            var measure = _measuresList.Select(m => m).Where(m => m.Description == checkBoxObj.Content.ToString()).FirstOrDefault();
+            var measure = _measuresList.Select(m => m).Where(m => m.Description == checkBoxObj.Content.ToString().Split('-')[0].Trim()).FirstOrDefault();
 
             if (measure == null)
                 return;

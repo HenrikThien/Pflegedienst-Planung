@@ -39,6 +39,7 @@ namespace PflegedientPlan
             activitysComboBox.SelectionChanged += activitysComboBox_SelectionChanged;
         }
 
+        #region Activity combobox selection changed
         private void activitysComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count > 0 && activitysComboBox.Items.Count > 0)
@@ -52,9 +53,14 @@ namespace PflegedientPlan
                 categoryCombobox.SelectedIndex = 0;
             }
         }
+        #endregion
 
+        #region Usergrid selection changed
         private void userGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (e.AddedItems.Count <= 0)
+                return;
+
             var patient = (e.AddedItems[0] as Patient);
 
             if (patient == null)
@@ -91,6 +97,7 @@ namespace PflegedientPlan
 
             measuresDataGrid.ItemsSource = StaticHolder.SelectedMeasures[patient.PatientId];
         }
+        #endregion
 
         #region Init program, load items async
         private async void Init()
@@ -235,7 +242,7 @@ namespace PflegedientPlan
         #region Add new user to database
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (handlePatientBtn.Content == "Bearbeiten")
+            if (handlePatientBtn.Content.ToString() == "Bearbeiten")
             {
                 if (!string.IsNullOrEmpty(patNrBox.Text) && !string.IsNullOrEmpty(patVornameBox.Text) && !string.IsNullOrEmpty(patNachnameBox.Text) && !string.IsNullOrEmpty(patGeburtsDatumBox.Text))
                 {
@@ -251,8 +258,8 @@ namespace PflegedientPlan
 
                         if (patient.PatientId != null && !string.IsNullOrEmpty(patient.PatientVorname) && !string.IsNullOrEmpty(patient.PatientNachname) && !string.IsNullOrEmpty(patient.PatientGeburtsdatum))
                         {
-
                             await UpdatePatientInDatabase(patient);
+                            userGrid.ItemsSource = null;
                             userGrid.ItemsSource = _patientList;
 
                             patNrBox.Text = "";
@@ -266,7 +273,8 @@ namespace PflegedientPlan
                     }
                 }
             }
-            else if (handlePatientBtn.Content == "Hinzufügen")
+
+            if (handlePatientBtn.Content.ToString() == "Hinzufügen")
             {
                 try
                 {
@@ -310,8 +318,7 @@ namespace PflegedientPlan
                 }
             }
         }
-        #endregion
-
+        
         private async void WriteException(Exception ex)
         {
             await Logger.WriteException(ex.ToString());
@@ -350,6 +357,7 @@ namespace PflegedientPlan
                 }
             }
         }
+        #endregion
 
         private void addActivityMenu_Click(object sender, RoutedEventArgs e)
         {
@@ -441,6 +449,8 @@ namespace PflegedientPlan
                         {
                             MessageBox.Show("Der Patient wurde gelöscht!", "Gelöscht", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
+
+                        client.ClearParameter();
 
                         _patientList.Remove(patient);
                     }
@@ -838,5 +848,11 @@ namespace PflegedientPlan
             measuresDataGrid.ItemsSource = StaticHolder.SelectedMeasures[SelectedPatient.PatientId].OrderBy(m => m.Position).ToList();
         }
         #endregion
+
+        private void menuContextAbout_Click(object sender, RoutedEventArgs e)
+        {
+            var aboutBox = new AboutBox();
+            aboutBox.ShowDialog();
+        }
     }
 }

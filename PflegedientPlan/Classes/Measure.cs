@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace PflegedientPlan.Classes
 {
+    public enum FrequencyType
+    {
+        DAILY = 1,
+        WEEKLY = 2
+    }
+
     public class Measure
     {
         public int Id { get; set; }
@@ -15,5 +21,22 @@ namespace PflegedientPlan.Classes
         public int RealListIndex { get; set; }
         public int ActivityId { get; set; }
         public int Frequency { get; set; }
+        public FrequencyType FrequencyType { get; set; }
+
+        public string DescriptionString
+        {
+            get
+            {
+                return Description + " - Häufigkeit: " + Frequency + " | " + FrequencyTypeToString;
+            }
+        }
+
+        public string FrequencyTypeToString
+        {
+            get
+            {
+                return (FrequencyType == FrequencyType.DAILY) ? "Täglich" : "Wöchentlich";
+            }
+        }
     }
 }

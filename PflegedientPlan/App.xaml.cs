@@ -15,35 +15,6 @@ namespace PflegedientPlan
     {
         public App()
         {
-            Init();
-        }
-
-        private async void Init()
-        {
-            await Logger.InitAsync();
-
-            //await Task.Run(() =>
-            //{
-            //    try
-            //    {
-            //        string sourcePath = System.IO.Directory.GetCurrentDirectory();
-            //        appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            //        string fileName = "Storage.mdf";
-
-            //        System.Diagnostics.Debug.WriteLine(appDataPath + "\\" + fileName);
-
-            //        System.IO.File.Copy(sourcePath + "\\" + fileName, appDataPath + "\\" + fileName, false);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        WriteException(ex);
-            //    }
-            //});
-        }
-
-        private async void WriteException(Exception ex)
-        {
-            await Logger.WriteException(ex.ToString());
         }
     }
 }

@@ -11,7 +11,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>    
 
-            <Label Content="Lade das Programm, bitte warten.." FontSize="30" HorizontalAlignment="Center" Grid.Row="0" />
+            <Label Content="Das Programm wird geladen, bitte warten.." FontSize="25" HorizontalAlignment="Center" Grid.Row="0" />
             <ProgressBar IsIndeterminate="True" Height="20" Grid.Row="1" VerticalAlignment="Stretch" Margin="20" />
         </Grid>
         
@@ -44,7 +44,7 @@
                         </MenuItem>
                     </MenuItem>
                     <MenuItem Header="Hilfe">
-                        <MenuItem x:Name="About" Header="Über das Programm" HorizontalAlignment="Left" Width="Auto">
+                        <MenuItem x:Name="About" Header="Über das Programm" HorizontalAlignment="Left" Width="Auto" Click="menuContextAbout_Click">
                         </MenuItem>
                     </MenuItem>
                 </Menu>
@@ -281,6 +281,8 @@
                                     Binding="{Binding Description}"/>
                                 <DataGridTextColumn Header="Häufigkeit" Width="Auto"
                                     Binding="{Binding Frequency}"/>
+                                <DataGridTextColumn Header="Type" Width="Auto"
+                                    Binding="{Binding FrequencyTypeToString}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
