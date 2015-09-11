@@ -341,27 +341,34 @@ namespace PflegedientPlan
         #region Add new problem to database
         private async void addNewProblemBtn_Click(object sender, RoutedEventArgs e)
         {
-            var description = newProblemTextBox.Text;
-
-            if (!string.IsNullOrEmpty(description))
+            try
             {
-                using (var client = new DatabaseClient())
+                var description = newProblemTextBox.Text;
+
+                if (!string.IsNullOrEmpty(description))
                 {
-                    if (await client.OpenConnectionAsync())
+                    using (var client = new DatabaseClient())
                     {
-                        client.AddParam<int>("@pos", 0);
-                        client.AddParam<string>("@desc", description);
-                        client.AddParam<int>("@activity_id", SelectedActivity.Id);
-                        client.AddParam<int>("@category_id", SelectedCategory.Id);
-                        client.ExecuteAsync("INSERT INTO problems (position, description, activity_id, category_id) VALUES (@pos, @desc, @activity_id, @category_id);");
-                        client.ClearParameter();
+                        if (await client.OpenConnectionAsync())
+                        {
+                            client.AddParam<int>("@pos", 0);
+                            client.AddParam<string>("@desc", description);
+                            client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                            client.AddParam<int>("@category_id", SelectedCategory.Id);
+                            await client.ExecuteAsync("INSERT INTO problems (position, description, activity_id, category_id) VALUES (@pos, @desc, @activity_id, @category_id);");
+                            client.ClearParameter();
+                        }
                     }
+
+                    newProblemTextBox.Text = "";
+
+                    await LoadProblemsAsync();
+                    LoadSelectedProblems();
                 }
-
-                newProblemTextBox.Text = "";
-
-                await LoadProblemsAsync();
-                LoadSelectedProblems();
+            }
+            catch (Exception ex)
+            {
+                WriteException(ex);
             }
         }
         #endregion
@@ -369,26 +376,33 @@ namespace PflegedientPlan
         #region Add new resource to database
         private async void addNewResourceBtn_Click(object sender, RoutedEventArgs e)
         {
-            var description = newResourceTextBox.Text;
-
-            if (!string.IsNullOrEmpty(description))
+            try
             {
-                using (var client = new DatabaseClient())
-                {
-                    if (await client.OpenConnectionAsync())
-                    {
-                        client.AddParam<int>("@pos", 0);
-                        client.AddParam<string>("@desc", description);
-                        client.AddParam<int>("@activity_id", SelectedActivity.Id);
-                        client.AddParam<int>("@category_id", SelectedCategory.Id);
-                        client.ExecuteAsync("INSERT INTO resources (position, description, activity_id, category_id) VALUES (@pos, @desc, @activity_id, @category_id);");
-                        client.ClearParameter();
-                    }
-                }
+                var description = newResourceTextBox.Text;
 
-                newResourceTextBox.Text = "";
-                await LoadResourcesAsync();
-                LoadSelectedResources();
+                if (!string.IsNullOrEmpty(description))
+                {
+                    using (var client = new DatabaseClient())
+                    {
+                        if (await client.OpenConnectionAsync())
+                        {
+                            client.AddParam<int>("@pos", 0);
+                            client.AddParam<string>("@desc", description);
+                            client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                            client.AddParam<int>("@category_id", SelectedCategory.Id);
+                            await client.ExecuteAsync("INSERT INTO resources (position, description, activity_id, category_id) VALUES (@pos, @desc, @activity_id, @category_id);");
+                            client.ClearParameter();
+                        }
+                    }
+
+                    newResourceTextBox.Text = "";
+                    await LoadResourcesAsync();
+                    LoadSelectedResources();
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteException(ex);
             }
         }
         #endregion
@@ -396,26 +410,33 @@ namespace PflegedientPlan
         #region Add new target to database
         private async void addNewTargetBtn_Click(object sender, RoutedEventArgs e)
         {
-            var description = newTargetTextBox.Text;
-
-            if (!string.IsNullOrEmpty(description))
+            try
             {
-                using (var client = new DatabaseClient())
-                {
-                    if (await client.OpenConnectionAsync())
-                    {
-                        client.AddParam<int>("@pos", 0);
-                        client.AddParam<string>("@desc", description);
-                        client.AddParam<int>("@activity_id", SelectedActivity.Id);
-                        client.AddParam<int>("@category_id", SelectedCategory.Id);
-                        client.ExecuteAsync("INSERT INTO targets (position, description, activity_id, category_id) VALUES (@pos, @desc, @activity_id, @category_id);");
-                        client.ClearParameter();
-                    }
-                }
+                var description = newTargetTextBox.Text;
 
-                newTargetTextBox.Text = "";
-                await LoadTargetsAsync();
-                LoadSelectedTargets();
+                if (!string.IsNullOrEmpty(description))
+                {
+                    using (var client = new DatabaseClient())
+                    {
+                        if (await client.OpenConnectionAsync())
+                        {
+                            client.AddParam<int>("@pos", 0);
+                            client.AddParam<string>("@desc", description);
+                            client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                            client.AddParam<int>("@category_id", SelectedCategory.Id);
+                            await client.ExecuteAsync("INSERT INTO targets (position, description, activity_id, category_id) VALUES (@pos, @desc, @activity_id, @category_id);");
+                            client.ClearParameter();
+                        }
+                    }
+
+                    newTargetTextBox.Text = "";
+                    await LoadTargetsAsync();
+                    LoadSelectedTargets();
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteException(ex);
             }
         }
         #endregion
@@ -423,33 +444,40 @@ namespace PflegedientPlan
         #region Add new measure to database
         private async void addNewMeasureBtn_Click(object sender, RoutedEventArgs e)
         {
-            var description = newMeasureTextBox.Text;
-            var frequency = int.Parse(measureFrequencyComboBox.SelectedItem.ToString());
-
-            if (!string.IsNullOrEmpty(description))
+            try
             {
-                using (var client = new DatabaseClient())
+                var description = newMeasureTextBox.Text;
+                var frequency = int.Parse(measureFrequencyComboBox.SelectedItem.ToString());
+
+                if (!string.IsNullOrEmpty(description))
                 {
-                    if (await client.OpenConnectionAsync())
+                    using (var client = new DatabaseClient())
                     {
-                        client.AddParam<int>("@pos", 0);
-                        client.AddParam<string>("@desc", description);
-                        client.AddParam<int>("@activity_id", SelectedActivity.Id);
-                        client.AddParam<int>("@frequency", frequency);
-                        client.AddParam<int>("@category_id", SelectedCategory.Id);
-                        client.AddParam<int>("@frequency_type", (measureFrequencyType.SelectedIndex == 0) ? 1 : 2);
+                        if (await client.OpenConnectionAsync())
+                        {
+                            client.AddParam<int>("@pos", 0);
+                            client.AddParam<string>("@desc", description);
+                            client.AddParam<int>("@activity_id", SelectedActivity.Id);
+                            client.AddParam<int>("@frequency", frequency);
+                            client.AddParam<int>("@category_id", SelectedCategory.Id);
+                            client.AddParam<int>("@frequency_type", (measureFrequencyType.SelectedIndex == 0) ? 1 : 2);
 
-                        client.ExecuteAsync("INSERT INTO measures (position, description, activity_id, frequency, category_id, type) VALUES (@pos, @desc, @activity_id, @frequency, @category_id, @frequency_type);");
-                        client.ClearParameter();
+                            await client.ExecuteAsync("INSERT INTO measures (position, description, activity_id, frequency, category_id, type) VALUES (@pos, @desc, @activity_id, @frequency, @category_id, @frequency_type);");
+                            client.ClearParameter();
+                        }
                     }
+
+                    newMeasureTextBox.Text = "";
+                    measureFrequencyComboBox.SelectedIndex = 0;
+                    measureFrequencyType.SelectedIndex = 0;
+
+                    await LoadMeasuresAsync();
+                    LoadSelectedMeasures();
                 }
-
-                newMeasureTextBox.Text = "";
-                measureFrequencyComboBox.SelectedIndex = 0;
-                measureFrequencyType.SelectedIndex = 0;
-
-                await LoadMeasuresAsync();
-                LoadSelectedMeasures();
+            }
+            catch (Exception ex)
+            {
+                WriteException(ex);
             }
         }
         #endregion
@@ -643,7 +671,7 @@ namespace PflegedientPlan
             if (checkBoxObj == null)
                 return;
 
-            var measure = _measuresList.Select(m => m).Where(m => m.Description == checkBoxObj.Content.ToString()).FirstOrDefault();
+            var measure = _measuresList.Select(m => m).Where(m => m.Description == checkBoxObj.Content.ToString().Split('-')[0].Trim()).FirstOrDefault();
 
             if (measure == null)
                 return;
@@ -659,5 +687,10 @@ namespace PflegedientPlan
             OnMeasureListUpdated.Invoke();
         }
         #endregion
+
+        private async void WriteException(Exception ex)
+        {
+            await Logger.WriteException(ex.ToString());
+        }
     }
 }

@@ -174,12 +174,12 @@
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
-                        <DataGrid x:Name="problemsDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="True" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
+                        <DataGrid x:Name="problemsDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="False" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#Pos." Width="Auto"
-                            Binding="{Binding Position}"/>
+                            Binding="{Binding Position}" IsReadOnly="True" />
                                 <DataGridTextColumn Header="Problem" Width="*"
-                            Binding="{Binding Description}"/>
+                            Binding="{Binding Description, NotifyOnTargetUpdated=True}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
@@ -207,12 +207,12 @@
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
-                        <DataGrid x:Name="resourcesDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="True" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
+                        <DataGrid x:Name="resourcesDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="False" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="#Pos." Width="Auto"
+                                <DataGridTextColumn Header="#Pos." Width="Auto" IsReadOnly="True"
                             Binding="{Binding Position}"/>
                                 <DataGridTextColumn Header="Ressource" Width="*"
-                            Binding="{Binding Description}"/>
+                            Binding="{Binding Description, NotifyOnTargetUpdated=True}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
@@ -240,12 +240,12 @@
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
-                        <DataGrid x:Name="targetsDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="True" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
+                        <DataGrid x:Name="targetsDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="false" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="#Pos." Width="Auto"
+                                <DataGridTextColumn Header="#Pos." Width="Auto" IsReadOnly="True"
                             Binding="{Binding Position}"/>
                                 <DataGridTextColumn Header="Ziel" Width="*"
-                            Binding="{Binding Description}"/>
+                            Binding="{Binding Description, NotifyOnTargetUpdated=True}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
@@ -273,15 +273,15 @@
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
-                        <DataGrid x:Name="measuresDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="True" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
+                        <DataGrid x:Name="measuresDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="False" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="#Pos." Width="Auto"
+                                <DataGridTextColumn Header="#Pos." Width="Auto" IsReadOnly="True"
                                     Binding="{Binding Position}"/>
                                 <DataGridTextColumn Header="Maßnahme" Width="*"
-                                    Binding="{Binding Description}"/>
-                                <DataGridTextColumn Header="Häufigkeit" Width="Auto"
+                                    Binding="{Binding Description, NotifyOnTargetUpdated=True}"/>
+                                <DataGridTextColumn Header="Häufigkeit" Width="Auto" IsReadOnly="True"
                                     Binding="{Binding Frequency}"/>
-                                <DataGridTextColumn Header="Type" Width="Auto"
+                                <DataGridTextColumn Header="Type" Width="Auto" IsReadOnly="True"
                                     Binding="{Binding FrequencyTypeToString}"/>
                             </DataGrid.Columns>
                         </DataGrid>

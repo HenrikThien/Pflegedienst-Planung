@@ -37,7 +37,90 @@ namespace PflegedientPlan
 
             userGrid.SelectionChanged += userGrid_SelectionChanged;
             activitysComboBox.SelectionChanged += activitysComboBox_SelectionChanged;
+
+            problemsDataGrid.CellEditEnding += problemsDataGrid_CellEditEnding;
+            resourcesDataGrid.CellEditEnding += resourcesDataGrid_CellEditEnding;
+            targetsDataGrid.CellEditEnding += targetsDataGrid_CellEditEnding;
+            measuresDataGrid.CellEditEnding += measuresDataGrid_CellEditEnding;
         }
+
+        #region cell edit ending events
+        void measuresDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            if (e.Column.Header == "Maßnahme")
+            {
+                var measureToEdit = (e.Row.Item as Measure);
+                var editedElement = (e.EditingElement as TextBox);
+
+                if (measureToEdit == null)
+                    return;
+                if (editedElement == null)
+                    return;
+
+                var newMeasureDescription = editedElement.Text;
+
+                int index = StaticHolder.SelectedMeasures[SelectedPatient.PatientId].IndexOf(measureToEdit);
+                StaticHolder.SelectedMeasures[SelectedPatient.PatientId][index].Description = newMeasureDescription;
+            }
+        }
+
+        void targetsDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            if (e.Column.Header == "Ziel")
+            {
+                var targetToEdit = (e.Row.Item as Target);
+                var editedElement = (e.EditingElement as TextBox);
+
+                if (targetToEdit == null)
+                    return;
+                if (editedElement == null)
+                    return;
+
+                var newTargetDescription = editedElement.Text;
+
+                int index = StaticHolder.SelectedTargets[SelectedPatient.PatientId].IndexOf(targetToEdit);
+                StaticHolder.SelectedTargets[SelectedPatient.PatientId][index].Description = newTargetDescription;
+            }
+        }
+
+        void resourcesDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            if (e.Column.Header == "Ressource")
+            {
+                var resourceToEdit = (e.Row.Item as Resource);
+                var editedElement = (e.EditingElement as TextBox);
+
+                if (resourceToEdit == null)
+                    return;
+                if (editedElement == null)
+                    return;
+
+                var newResourceDescription = editedElement.Text;
+
+                int index = StaticHolder.SelectedResources[SelectedPatient.PatientId].IndexOf(resourceToEdit);
+                StaticHolder.SelectedResources[SelectedPatient.PatientId][index].Description = newResourceDescription;
+            }
+        }
+
+        void problemsDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            if (e.Column.Header == "Problem")
+            {
+                var problemToEdit = (e.Row.Item as Problem);
+                var editedElement = (e.EditingElement as TextBox);
+
+                if (problemToEdit == null)
+                    return;
+                if (editedElement == null)
+                    return;
+
+                var newProblemDescription = editedElement.Text;
+
+                int index = StaticHolder.SelectedProblems[SelectedPatient.PatientId].IndexOf(problemToEdit);
+                StaticHolder.SelectedProblems[SelectedPatient.PatientId][index].Description = newProblemDescription;
+            }
+        }
+        #endregion
 
         #region Activity combobox selection changed
         private void activitysComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
