@@ -25,6 +25,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" MinWidth="400" />
@@ -177,7 +178,7 @@
                         <DataGrid x:Name="problemsDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="False" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#Pos." Width="Auto"
-                            Binding="{Binding Position}" IsReadOnly="True" />
+                            Binding="{Binding Position, NotifyOnTargetUpdated=True}" />
                                 <DataGridTextColumn Header="Problem" Width="*"
                             Binding="{Binding Description, NotifyOnTargetUpdated=True}"/>
                             </DataGrid.Columns>
@@ -209,8 +210,8 @@
 
                         <DataGrid x:Name="resourcesDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="False" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="#Pos." Width="Auto" IsReadOnly="True"
-                            Binding="{Binding Position}"/>
+                                <DataGridTextColumn Header="#Pos." Width="Auto"
+                            Binding="{Binding Position, NotifyOnTargetUpdated=True}"/>
                                 <DataGridTextColumn Header="Ressource" Width="*"
                             Binding="{Binding Description, NotifyOnTargetUpdated=True}"/>
                             </DataGrid.Columns>
@@ -242,8 +243,8 @@
 
                         <DataGrid x:Name="targetsDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="false" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="#Pos." Width="Auto" IsReadOnly="True"
-                            Binding="{Binding Position}"/>
+                                <DataGridTextColumn Header="#Pos." Width="Auto"
+                            Binding="{Binding Position, NotifyOnTargetUpdated=True}"/>
                                 <DataGridTextColumn Header="Ziel" Width="*"
                             Binding="{Binding Description, NotifyOnTargetUpdated=True}"/>
                             </DataGrid.Columns>
@@ -275,20 +276,30 @@
 
                         <DataGrid x:Name="measuresDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="False" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="#Pos." Width="Auto" IsReadOnly="True"
-                                    Binding="{Binding Position}"/>
+                                <DataGridTextColumn Header="#Pos." Width="Auto"
+                                    Binding="{Binding Position, NotifyOnTargetUpdated=True}"/>
                                 <DataGridTextColumn Header="Maßnahme" Width="*"
                                     Binding="{Binding Description, NotifyOnTargetUpdated=True}"/>
-                                <DataGridTextColumn Header="Häufigkeit" Width="Auto" IsReadOnly="True"
-                                    Binding="{Binding Frequency}"/>
-                                <DataGridTextColumn Header="Type" Width="Auto" IsReadOnly="True"
-                                    Binding="{Binding FrequencyTypeToString}"/>
+                                <DataGridTextColumn Header="Häufigkeit" Width="Auto"
+                                    Binding="{Binding Frequency, NotifyOnTargetUpdated=True}"/>
+                                <DataGridTextColumn Header="Type" Width="Auto"
+                                    Binding="{Binding FrequencyTypeToString, NotifyOnTargetUpdated=True}"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
                 </GroupBox>
             </Grid>
             <!-- Uebersicht end -->
+            
+            <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="btnPrintReview" Height="35" Content="Druckvorschau anzeigen" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5" Click="btnPrintReview_Click" />
+                <Button x:Name="btnPrint" Height="35" Content="Drucken" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5" Click="btnPrint_Click" />
+            </Grid>
         </Grid>
     </Grid>
 </Window>

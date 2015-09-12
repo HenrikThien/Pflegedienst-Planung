@@ -19,6 +19,11 @@
                                     <CheckBox Content="{Binding Description}" IsChecked="{Binding IsChecked}"  Margin="5 5 0 0" Checked="OnProblemChecked" Unchecked="OnProblemUnchecked" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Problem löschen" Click="contextMenuDeleteProblem_Click" />
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
                         </ListBox>
                     </Grid>
                     
@@ -52,6 +57,11 @@
                                     <CheckBox Content="{Binding Description}" IsChecked="{Binding IsChecked}"  Margin="5 5 0 0" Checked="OnResourceChecked" Unchecked="OnResourceUnchecked" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Ressource löschen" Click="contextMenuDeleteResource_Click" />
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
                         </ListBox>
                     </Grid>
 
@@ -85,6 +95,11 @@
                                     <CheckBox Content="{Binding Description}" IsChecked="{Binding IsChecked}"  Margin="5 5 0 0" Checked="OnTargetChecked" Unchecked="OnTargetUnchecked" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Ziel löschen" Click="contextMenuDeleteTarget_Click" />
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
                         </ListBox>
                     </Grid>
 
@@ -118,6 +133,11 @@
                                     <CheckBox Content="{Binding DescriptionString}" IsChecked="{Binding IsChecked}"  Margin="5 5 0 0" Checked="OnMeasureChecked" Unchecked="OnMeasureUnchecked" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Maßnahme löschen" Click="contextMenuDeleteMeasure_Click" />
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
                         </ListBox>
                     </Grid>
 

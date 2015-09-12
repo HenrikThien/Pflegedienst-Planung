@@ -37,6 +37,15 @@ namespace PflegedientPlan.Classes
             {
                 return (FrequencyType == FrequencyType.DAILY) ? "Täglich" : "Wöchentlich";
             }
+            set
+            {
+                var type = value;
+
+                if (type.ToLower() == "täglich")
+                    FrequencyType = FrequencyType.DAILY;
+                else if (type.ToLower() == "wöchentlich")
+                    FrequencyType = FrequencyType.WEEKLY;
+            }
         }
     }
 }

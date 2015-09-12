@@ -92,8 +92,6 @@ namespace PflegedientPlan
                 {
                     foreach (var problem in StaticHolder.SelectedProblems[SelectedPatient.PatientId])
                     {
-                        Debug.WriteLine(problem.Description);
-
                         var item = (_problemsList.Select(p => p).Where(p => p.Id == problem.Id).FirstOrDefault());
 
                         if (item != null)
@@ -688,9 +686,171 @@ namespace PflegedientPlan
         }
         #endregion
 
+        #region Write exception
         private async void WriteException(Exception ex)
         {
             await Logger.WriteException(ex.ToString());
         }
+        #endregion
+
+        #region Delete problem context menu
+        private async void contextMenuDeleteProblem_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = problemsListBox.SelectedItem as Problem;
+
+            if (selectedItem == null)
+                return;
+
+            var result = MessageBox.Show("\"" + selectedItem.Description + "\"\n - wirklich löschen?", "Löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                if (selectedItem.IsChecked)
+                {
+                    var itemToRemove = StaticHolder.SelectedProblems[SelectedPatient.PatientId].Select(i => i).Where(i => i.Id == selectedItem.Id).FirstOrDefault();
+
+                    if (itemToRemove == null)
+                        return;
+
+                    itemToRemove.IsChecked = false;
+                    StaticHolder.SelectedProblems[SelectedPatient.PatientId].Remove(itemToRemove);
+
+                    OnProblemListUpdated.Invoke();
+                }
+
+                using (var client = new DatabaseClient())
+                {
+                    if (await client.OpenConnectionAsync())
+                    {
+                        client.AddParam<int>("@id", selectedItem.Id);
+                        await client.ExecuteAsync("DELETE FROM problems WHERE id = @id;");
+                        client.ClearParameter();
+                    }
+                }
+
+                await LoadProblemsAsync();
+            }
+        }
+        #endregion
+
+        #region Delete resource context menu
+        private async void contextMenuDeleteResource_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = resourcesListBox.SelectedItem as Resource;
+
+            if (selectedItem == null)
+                return;
+
+            var result = MessageBox.Show("\"" + selectedItem.Description + "\"\n - wirklich löschen?", "Löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                if (selectedItem.IsChecked)
+                {
+                    var itemToRemove = StaticHolder.SelectedResources[SelectedPatient.PatientId].Select(i => i).Where(i => i.Id == selectedItem.Id).FirstOrDefault();
+
+                    if (itemToRemove == null)
+                        return;
+
+                    itemToRemove.IsChecked = false;
+                    StaticHolder.SelectedResources[SelectedPatient.PatientId].Remove(itemToRemove);
+
+                    OnResourceListUpdated.Invoke();
+                }
+
+                using (var client = new DatabaseClient())
+                {
+                    if (await client.OpenConnectionAsync())
+                    {
+                        client.AddParam<int>("@id", selectedItem.Id);
+                        await client.ExecuteAsync("DELETE FROM resources WHERE id = @id;");
+                        client.ClearParameter();
+                    }
+                }
+
+                await LoadResourcesAsync();
+            }
+        }
+        #endregion
+
+        #region Delete target context menu
+        private async void contextMenuDeleteTarget_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = targetsListBox.SelectedItem as Target;
+
+            if (selectedItem == null)
+                return;
+
+            var result = MessageBox.Show("\"" + selectedItem.Description + "\"\n - wirklich löschen?", "Löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                if (selectedItem.IsChecked)
+                {
+                    var itemToRemove = StaticHolder.SelectedTargets[SelectedPatient.PatientId].Select(i => i).Where(i => i.Id == selectedItem.Id).FirstOrDefault();
+
+                    if (itemToRemove == null)
+                        return;
+
+                    itemToRemove.IsChecked = false;
+                    StaticHolder.SelectedTargets[SelectedPatient.PatientId].Remove(itemToRemove);
+
+                    OnTargetListUpdated.Invoke();
+                }
+
+                using (var client = new DatabaseClient())
+                {
+                    if (await client.OpenConnectionAsync())
+                    {
+                        client.AddParam<int>("@id", selectedItem.Id);
+                        await client.ExecuteAsync("DELETE FROM targets WHERE id = @id;");
+                        client.ClearParameter();
+                    }
+                }
+
+                await LoadTargetsAsync();
+            }
+        }
+        #endregion
+
+        #region Delete measure context menu
+        private async void contextMenuDeleteMeasure_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = measuresListBox.SelectedItem as Measure;
+
+            if (selectedItem == null)
+                return;
+
+            var result = MessageBox.Show("\"" + selectedItem.Description + "\"\n - wirklich löschen?", "Löschen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                if (selectedItem.IsChecked)
+                {
+                    var itemToRemove = StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Select(i => i).Where(i => i.Id == selectedItem.Id).FirstOrDefault();
+
+                    if (itemToRemove == null)
+                        return;
+
+                    itemToRemove.IsChecked = false;
+                    StaticHolder.SelectedMeasures[SelectedPatient.PatientId].Remove(itemToRemove);
+
+                    OnMeasureListUpdated.Invoke();
+                }
+
+                using (var client = new DatabaseClient())
+                {
+                    if (await client.OpenConnectionAsync())
+                    {
+                        client.AddParam<int>("@id", selectedItem.Id);
+                        await client.ExecuteAsync("DELETE FROM measures WHERE id = @id;");
+                        client.ClearParameter();
+                    }
+                }
+
+                await LoadMeasuresAsync();
+            }
+        }
+        #endregion
     }
 }
