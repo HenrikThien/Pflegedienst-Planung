@@ -49,6 +49,7 @@ namespace PflegedientPlan
             {
                 measureFrequencyComboBox.Items.Add(i.ToString());
             }
+
             measureFrequencyComboBox.SelectedIndex = 0;
             
             Init();

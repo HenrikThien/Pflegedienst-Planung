@@ -22,8 +22,20 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_B48B4A9F022F2D1312AB223C82E4E014"
+        "OwnerKey" = "8:_A3BE1BC6C20945B3B54662B0F5279A00"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_A3BE1BC6C20945B3B54662B0F5279A00"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_B48B4A9F022F2D1312AB223C82E4E014"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -131,6 +143,37 @@
         }
         "File"
         {
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B48B4A9F022F2D1312AB223C82E4E014"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_B48B4A9F022F2D1312AB223C82E4E014"
+                    {
+                    "Name" = "8:Newtonsoft.Json.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Newtonsoft.Json.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_23FAC1A4D79B4C41B2A2BFC76791E80A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -198,7 +241,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Pflegedienst Planung"
+        "ProductName" = "8:VIS VITALIS - Pflegeplanung"
         "ProductCode" = "8:{6B6AC1FE-2235-4348-8E22-3BBE801BA3E5}"
         "PackageCode" = "8:{5DDC2625-BE70-46DE-9C28-892DB827C81F}"
         "UpgradeCode" = "8:{6ADD5C24-F811-4DAF-88F6-03E0291E8D0F}"
@@ -215,7 +258,7 @@
         "Subject" = "8:"
         "ARPCONTACT" = "8:Henrik Thien VIS VITALIS"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:Pflege Planung"
+        "ARPCOMMENTS" = "8:Ein Programm zur erstellung von Pflegeplänen."
         "ARPURLINFOABOUT" = "8:"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"

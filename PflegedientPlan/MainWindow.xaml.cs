@@ -1,8 +1,11 @@
 ﻿using PflegedientPlan.Classes;
+using PflegedientPlan.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -16,6 +19,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Web;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using iTextSharp.text.html.simpleparser;
+using System.Web.UI;
+using System.Windows.Controls.Primitives;
+using System.Collections; 
 
 namespace PflegedientPlan
 {
@@ -1029,14 +1039,139 @@ namespace PflegedientPlan
             aboutBox.ShowDialog();
         }
 
-        private void btnPrintReview_Click(object sender, RoutedEventArgs e)
+        #region print
+        private void menuPrintReview_Click(object sender, RoutedEventArgs e)
         {
-            
+            ExportSelectedToPdf();
         }
 
-        private void btnPrint_Click(object sender, RoutedEventArgs e)
+        private void ExportSelectedToPdf()
+        {
+            var columns = new Dictionary<int, object>();
+
+            var probColumns = (from i in StaticHolder.SelectedProblems[SelectedPatient.PatientId] orderby i.Position select i);
+            var resoColumns = (from i in StaticHolder.SelectedResources[SelectedPatient.PatientId] orderby i.Position select i);
+
+            int te = 0;
+        }
+
+        private void ExportToPdf(DataGrid grid)
+        {
+            var table = new PdfPTable(grid.Columns.Count);
+
+            foreach (DataGridColumn column in grid.Columns)
+            {
+                if (column.Header.ToString() == "#Pos.")
+                {
+                    table.AddCell(new Phrase("Nr"));
+                }
+                else
+                {
+                    table.AddCell(new Phrase(column.Header.ToString()));
+                }
+            }
+
+            table.HeaderRows = 1;
+            IEnumerable itemsSource = grid.ItemsSource as IEnumerable;
+            if (itemsSource != null)
+            {
+                foreach (var item in itemsSource)
+                {
+                    DataGridRow row = grid.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;
+                    if (row != null)
+                    {
+                        DataGridCellsPresenter presenter = FindVisualChild<DataGridCellsPresenter>(row);
+                        for (int i = 0; i < grid.Columns.Count; ++i)
+                        {
+                            DataGridCell cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(i);
+                            TextBlock txt = cell.Content as TextBlock;
+                            if (txt != null)
+                            {
+                                table.AddCell(new Phrase(txt.Text));
+                            }
+                        }
+                    }
+                }
+
+                var document = new Document(PageSize.A3, 10f, 10f, 10f, 10f);
+                var writer = PdfWriter.GetInstance(document, new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\VIS VITALIS\\test.pdf", FileMode.Create));
+                document.Open();
+
+                document.Add(table);
+
+                iTextSharp.text.Paragraph firstpara = new iTextSharp.text.Paragraph("Test 1");
+                document.Add(firstpara);
+                document.Close();
+            }
+        }
+
+        private T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+                if (child != null && child is T)
+                    return (T)child;
+                else
+                {
+                    T childOfChild = FindVisualChild<T>(child);
+                    if (childOfChild != null)
+                        return childOfChild;
+                }
+            }
+            return null;
+        }
+
+        private void menuPrint_Click(object sender, RoutedEventArgs e)
         {
 
         }
+        #endregion
+
+        #region Save & Load
+        private async void mainMenuLoadPatient_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedPatient != null)
+            {
+                using (var fileManager = new FileManager(SelectedPatient))
+                {
+                    var mask = await fileManager.LoadPatient();
+
+                    if (mask == null)
+                    {
+                        return;
+                    }
+
+                    StaticHolder.SelectedProblems[SelectedPatient.PatientId] = mask.Problems;
+                    StaticHolder.SelectedResources[SelectedPatient.PatientId] = mask.Resources;
+                    StaticHolder.SelectedTargets[SelectedPatient.PatientId] = mask.Targets;
+                    StaticHolder.SelectedMeasures[SelectedPatient.PatientId] = mask.Measures;
+
+                    addToMaskWindow_OnProblemListUpdated();
+                    addToMaskWindow_OnResourceListUpdated();
+                    addToMaskWindow_OnTargetListUpdated();
+                    addToMaskWindow_OnMeasureListUpdated();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Es wurde kein Patient ausgewählt!", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        private async void mainMenuSavePatient_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedPatient != null)
+            {
+                using (var fileManager = new FileManager(SelectedPatient))
+                {
+                    await fileManager.SavePatient();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Es wurde kein Patient ausgewählt!", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        #endregion
     }
 }

@@ -156,6 +156,7 @@
                         <ComboBox x:Name="measureFrequencyType" Margin="5" Grid.Column="3" SelectedIndex="0">
                             <ComboBoxItem>T</ComboBoxItem>
                             <ComboBoxItem>W</ComboBoxItem>
+                            <ComboBoxItem>I</ComboBoxItem>
                         </ComboBox>
                         <Button x:Name="addNewMeasureBtn" Grid.Column="4" Content="Hinzufügen" Margin="5" Click="addNewMeasureBtn_Click" />
                     </Grid>

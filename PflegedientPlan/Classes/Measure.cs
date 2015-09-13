@@ -9,7 +9,8 @@ namespace PflegedientPlan.Classes
     public enum FrequencyType
     {
         DAILY = 1,
-        WEEKLY = 2
+        WEEKLY = 2,
+        ALWAYS = 3
     }
 
     public class Measure
@@ -35,7 +36,7 @@ namespace PflegedientPlan.Classes
         {
             get
             {
-                return (FrequencyType == FrequencyType.DAILY) ? "Täglich" : "Wöchentlich";
+                return (FrequencyType == FrequencyType.DAILY) ? "Täglich" : (FrequencyType == FrequencyType.WEEKLY) ? "Wöchentlich" : "Immer";
             }
             set
             {
@@ -45,6 +46,8 @@ namespace PflegedientPlan.Classes
                     FrequencyType = FrequencyType.DAILY;
                 else if (type.ToLower() == "wöchentlich")
                     FrequencyType = FrequencyType.WEEKLY;
+                else
+                    FrequencyType = FrequencyType.ALWAYS;
             }
         }
     }
