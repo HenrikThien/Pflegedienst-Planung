@@ -13,15 +13,29 @@ namespace PflegedientPlan.Classes
         ALWAYS = 3
     }
 
-    public class Measure
+    public class Measure : iSuperItem
     {
         public int Id { get; set; }
-        public int Position { get; set; }
-        public string Description { get; set; }
+        public int Position
+        {
+            get { return base.SuperPosition; }
+            set { base.SuperPosition = value; }
+        }
+        public string Description
+        {
+            get { return base.SuperDescription; }
+            set { base.SuperDescription = value; }
+        }
         public bool IsChecked { get; set; }
         public int RealListIndex { get; set; }
         public int ActivityId { get; set; }
         public int Frequency { get; set; }
+        
+        public void SetSuperFrequency()
+        {
+            base.SuperFrequency = (FrequencyType == Classes.FrequencyType.DAILY || FrequencyType == Classes.FrequencyType.WEEKLY) ? Frequency + "x " + FrequencyTypeToString : FrequencyTypeToString;
+        }
+
         public FrequencyType FrequencyType { get; set; }
 
         public string DescriptionString

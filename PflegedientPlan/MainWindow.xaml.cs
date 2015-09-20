@@ -25,7 +25,8 @@ using iTextSharp.text.pdf;
 using iTextSharp.text.html.simpleparser;
 using System.Web.UI;
 using System.Windows.Controls.Primitives;
-using System.Collections; 
+using System.Collections;
+using iTextSharp.text.pdf.draw;
 
 namespace PflegedientPlan
 {
@@ -34,7 +35,7 @@ namespace PflegedientPlan
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Patient SelectedPatient { get; set; }
+        public static Patient SelectedPatient { get; set; }
 
         private readonly ObservableCollection<Patient> _patientList = new ObservableCollection<Patient>();
         private ObservableCollection<Activity> _activityList = new ObservableCollection<Activity>();
@@ -602,7 +603,7 @@ namespace PflegedientPlan
             }
         }
 
-        private async void contextMenuEditPatient_Click(object sender, RoutedEventArgs e)
+        private void contextMenuEditPatient_Click(object sender, RoutedEventArgs e)
         {
             var selectedPatient = (userGrid.SelectedItem as Patient);
 
@@ -712,14 +713,7 @@ namespace PflegedientPlan
                 return;
             }
 
-            var itemOnPositionAbove = (problemsDataGrid.Items[currentItemPosition - 1] as Problem);
-
             selectedProblem.Position -= 1;
-
-            if (itemOnPositionAbove != null)
-            {
-                itemOnPositionAbove.Position += 1;
-            }
 
             problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems[SelectedPatient.PatientId].OrderBy(p => p.Position).ToList();
         }
@@ -733,19 +727,12 @@ namespace PflegedientPlan
 
             int currentItemPosition = selectedProblem.Position;
 
-            if (currentItemPosition == problemsDataGrid.Items.Count - 1)
+            if (currentItemPosition == problemsDataGrid.Items.Count)
             {
                 return;
             }
 
-            var itemOnPositionAbove = (problemsDataGrid.Items[currentItemPosition + 1] as Problem);
-
             selectedProblem.Position += 1;
-
-            if (itemOnPositionAbove != null)
-            {
-                itemOnPositionAbove.Position -= 1;
-            }
 
             problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems[SelectedPatient.PatientId].OrderBy(p => p.Position).ToList();
         }
@@ -798,14 +785,7 @@ namespace PflegedientPlan
                 return;
             }
 
-            var itemOnPositionAbove = (resourcesDataGrid.Items[currentItemPosition - 1] as Resource);
-
             selectedResource.Position -= 1;
-
-            if (itemOnPositionAbove != null)
-            {
-                itemOnPositionAbove.Position += 1;
-            }
 
             resourcesDataGrid.ItemsSource = StaticHolder.SelectedResources[SelectedPatient.PatientId].OrderBy(r => r.Position).ToList();
         }
@@ -819,19 +799,12 @@ namespace PflegedientPlan
 
             int currentItemPosition = selectedResource.Position;
 
-            if (currentItemPosition == resourcesDataGrid.Items.Count - 1)
+            if (currentItemPosition == resourcesDataGrid.Items.Count)
             {
                 return;
             }
 
-            var itemOnPositionAbove = (resourcesDataGrid.Items[currentItemPosition + 1] as Resource);
-
             selectedResource.Position += 1;
-
-            if (itemOnPositionAbove != null)
-            {
-                itemOnPositionAbove.Position -= 1;
-            }
 
             resourcesDataGrid.ItemsSource = StaticHolder.SelectedResources[SelectedPatient.PatientId].OrderBy(r => r.Position).ToList();
         }
@@ -884,15 +857,7 @@ namespace PflegedientPlan
                 return;
             }
 
-            var itemOnPositionAbove = (targetsDataGrid.Items[currentItemPosition - 1] as Target);
-
             selectedTarget.Position -= 1;
-
-            if (itemOnPositionAbove != null)
-            {
-                itemOnPositionAbove.Position += 1;
-            }
-
             targetsDataGrid.ItemsSource = StaticHolder.SelectedTargets[SelectedPatient.PatientId].OrderBy(t => t.Position).ToList();
         }
 
@@ -905,20 +870,12 @@ namespace PflegedientPlan
 
             int currentItemPosition = selectedTarget.Position;
 
-            if (currentItemPosition == targetsDataGrid.Items.Count - 1)
+            if (currentItemPosition == targetsDataGrid.Items.Count)
             {
                 return;
             }
 
-            var itemOnPositionAbove = (targetsDataGrid.Items[currentItemPosition + 1] as Target);
-
             selectedTarget.Position += 1;
-
-            if (itemOnPositionAbove != null)
-            {
-                itemOnPositionAbove.Position -= 1;
-            }
-
             targetsDataGrid.ItemsSource = StaticHolder.SelectedTargets[SelectedPatient.PatientId].OrderBy(t => t.Position).ToList();
         }
 
@@ -970,15 +927,7 @@ namespace PflegedientPlan
                 return;
             }
 
-            var itemOnPositionAbove = (measuresDataGrid.Items[currentItemPosition - 1] as Measure);
-
             selectedMeasure.Position -= 1;
-
-            if (itemOnPositionAbove != null)
-            {
-                itemOnPositionAbove.Position += 1;
-            }
-
             measuresDataGrid.ItemsSource = StaticHolder.SelectedMeasures[SelectedPatient.PatientId].OrderBy(m => m.Position).ToList();
         }
 
@@ -991,20 +940,12 @@ namespace PflegedientPlan
 
             int currentItemPosition = selectedMeasure.Position;
 
-            if (currentItemPosition == measuresDataGrid.Items.Count - 1)
+            if (currentItemPosition == measuresDataGrid.Items.Count)
             {
                 return;
             }
 
-            var itemOnPositionAbove = (measuresDataGrid.Items[currentItemPosition + 1] as Measure);
-
             selectedMeasure.Position += 1;
-
-            if (itemOnPositionAbove != null)
-            {
-                itemOnPositionAbove.Position -= 1;
-            }
-
             measuresDataGrid.ItemsSource = StaticHolder.SelectedMeasures[SelectedPatient.PatientId].OrderBy(m => m.Position).ToList();
         }
 
@@ -1040,91 +981,259 @@ namespace PflegedientPlan
         }
 
         #region print
-        private void menuPrintReview_Click(object sender, RoutedEventArgs e)
+        private void menuSaveAsPDF_Click(object sender, RoutedEventArgs e)
         {
             ExportSelectedToPdf();
         }
 
         private void ExportSelectedToPdf()
         {
-            var columns = new Dictionary<int, object>();
+            var allItems = new List<iSuperItem>();
+            var formattedText = new Dictionary<int, Dictionary<int, List<iSuperItem>>>();
 
-            var probColumns = (from i in StaticHolder.SelectedProblems[SelectedPatient.PatientId] orderby i.Position select i);
-            var resoColumns = (from i in StaticHolder.SelectedResources[SelectedPatient.PatientId] orderby i.Position select i);
+            allItems.AddRange((from i in StaticHolder.SelectedProblems[SelectedPatient.PatientId] select i).ToList());
+            allItems.AddRange((from i in StaticHolder.SelectedResources[SelectedPatient.PatientId] select i).ToList());
+            allItems.AddRange((from i in StaticHolder.SelectedTargets[SelectedPatient.PatientId] select i).ToList());
+            allItems.AddRange((from i in StaticHolder.SelectedMeasures[SelectedPatient.PatientId] select i).ToList());
 
-            int te = 0;
-        }
-
-        private void ExportToPdf(DataGrid grid)
-        {
-            var table = new PdfPTable(grid.Columns.Count);
-
-            foreach (DataGridColumn column in grid.Columns)
+            
+            for (int i = 0; i < allItems.Count; i++)
             {
-                if (column.Header.ToString() == "#Pos.")
+                var itemsOnPos = (from x in allItems where x.SuperPosition == i select x);
+
+                foreach (var item in itemsOnPos)
                 {
-                    table.AddCell(new Phrase("Nr"));
-                }
-                else
-                {
-                    table.AddCell(new Phrase(column.Header.ToString()));
+                    if (!formattedText.ContainsKey(i))
+                    {
+                        formattedText.Add(i, new Dictionary<int, List<iSuperItem>>());
+                    }
+
+                    if (item.GetType() == typeof(Problem))
+                    {
+                        if (!formattedText[i].ContainsKey(0))
+                        {
+                            formattedText[i].Add(0, new List<iSuperItem>());
+                            formattedText[i][0].Add(item);
+                        }
+                        else
+                        {
+                            formattedText[i][0].Add(item);
+                        }
+                    }
+                    else if (item.GetType() == typeof(Resource))
+                    {
+                        if (!formattedText[i].ContainsKey(1))
+                        {
+                            formattedText[i].Add(1, new List<iSuperItem>());
+                            formattedText[i][1].Add(item);
+                        }
+                        else
+                        {
+                            formattedText[i][1].Add(item);
+                        }
+                    }
+                    else if (item.GetType() == typeof(Target))
+                    {
+                        if (!formattedText[i].ContainsKey(2))
+                        {
+                            formattedText[i].Add(2, new List<iSuperItem>());
+                            formattedText[i][2].Add(item);
+                        }
+                        else
+                        {
+                            formattedText[i][2].Add(item);
+                        }
+                    }
+                    else if (item.GetType() == typeof(Measure))
+                    {
+                        (item as Measure).SetSuperFrequency();
+
+                        if (!formattedText[i].ContainsKey(3))
+                        {
+                            formattedText[i].Add(3, new List<iSuperItem>());
+                            formattedText[i][3].Add(item);
+                        }
+                        else
+                        {
+                            formattedText[i][3].Add(item);
+                        }
+                    }
                 }
             }
 
-            table.HeaderRows = 1;
-            IEnumerable itemsSource = grid.ItemsSource as IEnumerable;
-            if (itemsSource != null)
+            CreateTestPdf(formattedText);
+        }
+
+        private void CreateTestPdf(Dictionary<int, Dictionary<int, List<iSuperItem>>> FormattedText)
+        {
+            PdfPTable table = new PdfPTable(10);
+            table.TotalWidth = PageSize.A3.Rotate().Width - 20; // -20 margin space
+            table.HorizontalAlignment = 0;
+            table.LockedWidth = true;
+            float[] widths = new float[] { 20f, 80f, 80f, 80f, 80f, 30f, 20f, 10f, 20, 10f };
+            table.SetWidths(widths);
+
+            int fixedPosition = 1;
+
+            foreach (var positions in FormattedText)
             {
-                foreach (var item in itemsSource)
+                int problemCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(0) ? FormattedText[positions.Key][0].Count : 0 : 0);
+                int resourceCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(1) ? FormattedText[positions.Key][1].Count : 0 : 0);
+                int targetCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(2) ? FormattedText[positions.Key][2].Count : 0 : 0);
+                int measureCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(3) ? FormattedText[positions.Key][3].Count : 0 : 0);
+                int highest = problemCount;
+
+                if (resourceCount > highest)
+                    highest = resourceCount;
+                if (targetCount > highest)
+                    highest = targetCount;
+                if (measureCount > highest)
+                    highest = measureCount;
+
+                var frequencyQueue = new Queue<string>();
+
+                AddCellToTable(table, fixedPosition + ".", false, highest);
+
+                for (int pos = 0; pos < highest; pos++)
                 {
-                    DataGridRow row = grid.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;
-                    if (row != null)
+                    for (int i = 0; i <= 8; i++)
                     {
-                        DataGridCellsPresenter presenter = FindVisualChild<DataGridCellsPresenter>(row);
-                        for (int i = 0; i < grid.Columns.Count; ++i)
+                        bool needToAddCell = true;
+
+                        if (i <= 3)
                         {
-                            DataGridCell cell = (DataGridCell)presenter.ItemContainerGenerator.ContainerFromIndex(i);
-                            TextBlock txt = cell.Content as TextBlock;
-                            if (txt != null)
+                            if (FormattedText.ContainsKey(positions.Key))
                             {
-                                table.AddCell(new Phrase(txt.Text));
+                                if (FormattedText[positions.Key].ContainsKey(i))
+                                {
+                                    if (FormattedText[positions.Key][i].ElementAtOrDefault(pos) != null)
+                                    {
+                                        if (pos == 0)
+                                        {
+                                            var text = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperDescription;
+                                            
+                                            if (i == 3)
+                                            {
+                                                var frequency = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperFrequency;
+
+                                                if (frequency != null)
+                                                {
+                                                    frequencyQueue.Enqueue(frequency);
+                                                }
+                                                else
+                                                {
+                                                    frequencyQueue.Enqueue("");
+                                                }
+                                            }
+
+                                            AddCellToTable(table, text, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.TOP_BORDER);
+                                            needToAddCell = false;
+                                        }
+                                        else
+                                        {
+                                            var text = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperDescription;
+                                            
+                                            if (i == 3)
+                                            {
+                                                var frequency = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperFrequency;
+
+                                                if (frequency != null)
+                                                {
+                                                    frequencyQueue.Enqueue(frequency);
+                                                }
+                                                else
+                                                {
+                                                    frequencyQueue.Enqueue("");
+                                                }
+                                            }
+
+                                            AddCellToTable(table, text, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER);
+                                            needToAddCell = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (i == 4)
+                        {
+                            if (pos == 0)
+                            {
+                                var frequency = (frequencyQueue.Count > 0) ? frequencyQueue.Dequeue() : "";
+                                AddCellToTable(table, frequency, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.TOP_BORDER);
+                                needToAddCell = false;
+                            }
+                            else
+                            {
+                                var frequency = (frequencyQueue.Count > 0) ? frequencyQueue.Dequeue() : "";
+                                AddCellToTable(table, frequency, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER);
+                                needToAddCell = false;
+                            }
+                        }
+
+                        if (needToAddCell)
+                        {
+                            if (pos == 0)
+                            {
+                                AddCellToTable(table, "", false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.TOP_BORDER);
+                            }
+                            else
+                            {
+                                AddCellToTable(table, "", false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER);
                             }
                         }
                     }
                 }
 
-                var document = new Document(PageSize.A3, 10f, 10f, 10f, 10f);
-                var writer = PdfWriter.GetInstance(document, new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\VIS VITALIS\\test.pdf", FileMode.Create));
+                fixedPosition++;
+            }
+
+            AddFooterToTable(table, "");
+
+            var saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            saveFileDialog.Filter = "PDF Dateien|*.pdf";
+            saveFileDialog.Title = "Als PDF speichern";
+            saveFileDialog.ValidateNames = true;
+            saveFileDialog.FileName = SelectedPatient.PatientId + " - " + SelectedPatient.PatientVorname + " " + SelectedPatient.PatientNachname + ".pdf";
+            saveFileDialog.ShowDialog();
+
+            if (saveFileDialog.FileName != "")
+            {
+                var document = new Document(PageSize.A3.Rotate(), 10f, 10f, 10f, 20f);
+                var writer = PdfWriter.GetInstance(document, new FileStream(saveFileDialog.FileName, FileMode.Create));
+                writer.PageEvent = new CustomPageEventHandler();
                 document.Open();
 
                 document.Add(table);
-
-                iTextSharp.text.Paragraph firstpara = new iTextSharp.text.Paragraph("Test 1");
-                document.Add(firstpara);
                 document.Close();
             }
         }
 
-        private T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
+        private void AddFooterToTable(PdfPTable table, string text)
         {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-                if (child != null && child is T)
-                    return (T)child;
-                else
-                {
-                    T childOfChild = FindVisualChild<T>(child);
-                    if (childOfChild != null)
-                        return childOfChild;
-                }
-            }
-            return null;
+            PdfPCell cell = new PdfPCell(new Phrase(text));
+            cell.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
+            cell.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
+            cell.Colspan = 10;
+            cell.Padding = 5;
+            table.AddCell(cell);
         }
 
-        private void menuPrint_Click(object sender, RoutedEventArgs e)
+        private void AddCellToTable(PdfPTable table, string text, bool header = false, int span = 1, int border = iTextSharp.text.Rectangle.TOP_BORDER | iTextSharp.text.Rectangle.BOTTOM_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.RIGHT_BORDER)
         {
+            BaseFont bfTimes = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, false);
 
+            iTextSharp.text.Font times = new iTextSharp.text.Font(bfTimes, 11, iTextSharp.text.Font.NORMAL, iTextSharp.text.BaseColor.BLACK);
+
+            if (header)
+                times.SetStyle(Font.BOLD);
+
+            PdfPCell cell = new PdfPCell(new Phrase(text, times));
+            cell.Border = border;
+            cell.Rowspan = span;
+            cell.Padding = 5;
+            cell.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
+            table.AddCell(cell);
         }
         #endregion
 
@@ -1133,24 +1242,29 @@ namespace PflegedientPlan
         {
             if (SelectedPatient != null)
             {
-                using (var fileManager = new FileManager(SelectedPatient))
+                var result = MessageBox.Show("Die Daten für den Patienten " + SelectedPatient.PatientVorname + " " + SelectedPatient.PatientNachname + " laden?", "Laden", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
                 {
-                    var mask = await fileManager.LoadPatient();
-
-                    if (mask == null)
+                    using (var fileManager = new FileManager(SelectedPatient))
                     {
-                        return;
+                        var mask = await fileManager.LoadPatient();
+
+                        if (mask == null)
+                        {
+                            return;
+                        }
+
+                        StaticHolder.SelectedProblems[SelectedPatient.PatientId] = mask.Problems;
+                        StaticHolder.SelectedResources[SelectedPatient.PatientId] = mask.Resources;
+                        StaticHolder.SelectedTargets[SelectedPatient.PatientId] = mask.Targets;
+                        StaticHolder.SelectedMeasures[SelectedPatient.PatientId] = mask.Measures;
+
+                        addToMaskWindow_OnProblemListUpdated();
+                        addToMaskWindow_OnResourceListUpdated();
+                        addToMaskWindow_OnTargetListUpdated();
+                        addToMaskWindow_OnMeasureListUpdated();
                     }
-
-                    StaticHolder.SelectedProblems[SelectedPatient.PatientId] = mask.Problems;
-                    StaticHolder.SelectedResources[SelectedPatient.PatientId] = mask.Resources;
-                    StaticHolder.SelectedTargets[SelectedPatient.PatientId] = mask.Targets;
-                    StaticHolder.SelectedMeasures[SelectedPatient.PatientId] = mask.Measures;
-
-                    addToMaskWindow_OnProblemListUpdated();
-                    addToMaskWindow_OnResourceListUpdated();
-                    addToMaskWindow_OnTargetListUpdated();
-                    addToMaskWindow_OnMeasureListUpdated();
                 }
             }
             else
@@ -1162,9 +1276,14 @@ namespace PflegedientPlan
         {
             if (SelectedPatient != null)
             {
-                using (var fileManager = new FileManager(SelectedPatient))
+                var result = MessageBox.Show("Die Daten für den Patienten " + SelectedPatient.PatientVorname + " " + SelectedPatient.PatientNachname + " speichern?", "Speichern", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
                 {
-                    await fileManager.SavePatient();
+                    using (var fileManager = new FileManager(SelectedPatient))
+                    {
+                        await fileManager.SavePatient();
+                    }
                 }
             }
             else

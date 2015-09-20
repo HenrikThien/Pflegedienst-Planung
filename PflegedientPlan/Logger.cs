@@ -25,7 +25,7 @@ namespace PflegedientPlan
         public async static Task WriteException(string exception)
         {
             await InitAsync();
-            await Task.Run(() => File.AppendAllText(ERROR_FILE, "[" + DateTime.Now.ToString("HH:mm:ss") + "]" + exception + Environment.NewLine));
+            await Task.Factory.StartNew(() => File.AppendAllText(ERROR_FILE, "[" + DateTime.Now.ToString("HH:mm:ss") + "]" + exception + Environment.NewLine));
         }
     }
 }

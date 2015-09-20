@@ -10,6 +10,7 @@ namespace PflegedientPlan
     {
         public int Id { get; set; }
         public int ParentId { get; set; }
+
         public string ActivityDescription { get; set; }
         public string CategoryDescription { get; set; }
 

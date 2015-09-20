@@ -148,8 +148,13 @@ namespace PflegedientPlan
                         client.AddParam<int>("@activity_id", activity.Id);
                         var count = await client.ExecuteAsync("DELETE FROM activitys WHERE Id = @activity_id;");
                         client.ClearParameter();
+
                         client.AddParam<int>("@parent_id", activity.Id);
                         await client.ExecuteAsync("DELETE FROM categorys WHERE activity_id = @parent_id;");
+                        client.ClearParameter();
+
+                        client.AddParam<int>("@activity_id", activity.Id);
+                        await client.ExecuteAsync("DELETE problems FROM problems p JOIN resources r ON p.activity_id = r.activity_id JOIN targets t ON p.activity_id = t.activity_id JOIN measures m ON p.activity_id = m.activity_id WHERE p.activity_id = @activity_id;");
                         
                         if (count > 0)
                         {

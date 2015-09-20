@@ -44,9 +44,8 @@
                         <MenuItem x:Name="categoryAdd" Header="Kategorie hinzufügen" Click="addCategoryMenu_Click" HorizontalAlignment="Left" Width="Auto">
                         </MenuItem>
                     </MenuItem>
-                    <MenuItem Header="Drucken">
-                        <MenuItem Header="Druckvorschau anzeigen" HorizontalAlignment="Left" Width="Auto" Click="menuPrintReview_Click" />
-                        <MenuItem Header="Drucken" HorizontalAlignment="Left" Width="Auto" Click="menuPrint_Click" />
+                    <MenuItem Header="Speichern">
+                        <MenuItem Header="Als PDF Datei speichern" HorizontalAlignment="Left" Width="Auto" Click="menuSaveAsPDF_Click" />
                     </MenuItem>
                     <MenuItem Header="Hilfe">
                         <MenuItem x:Name="About" Header="Über das Programm" HorizontalAlignment="Left" Width="Auto" Click="menuContextAbout_Click">

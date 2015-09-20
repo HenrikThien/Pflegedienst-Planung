@@ -198,6 +198,10 @@ namespace PflegedientPlan
                         var count = await client.ExecuteAsync("DELETE FROM categorys WHERE Id = @category_id;");
                         client.ClearParameter();
 
+                        client.AddParam<int>("@category_id", category.Id);
+                        await client.ExecuteAsync("DELETE problems FROM problems p JOIN resources r ON p.category_id = r.category_id JOIN targets t ON p.category_id = t.category_id JOIN measures m ON p.category_id = m.category_id WHERE p.category_id = @category_id;");
+                        client.ClearParameter();
+
                         if (count > 0)
                         {
                             MessageBox.Show("Die Kategorie wurde erfolgreich gelöscht", "Gelöscht");
