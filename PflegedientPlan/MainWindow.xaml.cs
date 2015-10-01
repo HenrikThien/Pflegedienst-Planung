@@ -983,236 +983,252 @@ namespace PflegedientPlan
         #region print
         private void menuSaveAsPDF_Click(object sender, RoutedEventArgs e)
         {
-            ExportSelectedToPdf();
+            LoadExportToPDFAsync();
         }
 
-        private void ExportSelectedToPdf()
+        private async void LoadExportToPDFAsync()
+        {
+            await ExportSelectedToPdf();
+        }
+
+        private async Task ExportSelectedToPdf()
         {
             var allItems = new List<iSuperItem>();
             var formattedText = new Dictionary<int, Dictionary<int, List<iSuperItem>>>();
 
-            allItems.AddRange((from i in StaticHolder.SelectedProblems[SelectedPatient.PatientId] select i).ToList());
-            allItems.AddRange((from i in StaticHolder.SelectedResources[SelectedPatient.PatientId] select i).ToList());
-            allItems.AddRange((from i in StaticHolder.SelectedTargets[SelectedPatient.PatientId] select i).ToList());
-            allItems.AddRange((from i in StaticHolder.SelectedMeasures[SelectedPatient.PatientId] select i).ToList());
-
-            
-            for (int i = 0; i < allItems.Count; i++)
+            await Task.Factory.StartNew(() =>
             {
-                var itemsOnPos = (from x in allItems where x.SuperPosition == i select x);
+                allItems.AddRange((from i in StaticHolder.SelectedProblems[SelectedPatient.PatientId] select i).ToList());
+                allItems.AddRange((from i in StaticHolder.SelectedResources[SelectedPatient.PatientId] select i).ToList());
+                allItems.AddRange((from i in StaticHolder.SelectedTargets[SelectedPatient.PatientId] select i).ToList());
+                allItems.AddRange((from i in StaticHolder.SelectedMeasures[SelectedPatient.PatientId] select i).ToList());
 
-                foreach (var item in itemsOnPos)
+
+                for (int i = 0; i < allItems.Count; i++)
                 {
-                    if (!formattedText.ContainsKey(i))
-                    {
-                        formattedText.Add(i, new Dictionary<int, List<iSuperItem>>());
-                    }
+                    var itemsOnPos = (from x in allItems where x.SuperPosition == i select x);
 
-                    if (item.GetType() == typeof(Problem))
+                    foreach (var item in itemsOnPos)
                     {
-                        if (!formattedText[i].ContainsKey(0))
+                        if (!formattedText.ContainsKey(i))
                         {
-                            formattedText[i].Add(0, new List<iSuperItem>());
-                            formattedText[i][0].Add(item);
+                            formattedText.Add(i, new Dictionary<int, List<iSuperItem>>());
                         }
-                        else
-                        {
-                            formattedText[i][0].Add(item);
-                        }
-                    }
-                    else if (item.GetType() == typeof(Resource))
-                    {
-                        if (!formattedText[i].ContainsKey(1))
-                        {
-                            formattedText[i].Add(1, new List<iSuperItem>());
-                            formattedText[i][1].Add(item);
-                        }
-                        else
-                        {
-                            formattedText[i][1].Add(item);
-                        }
-                    }
-                    else if (item.GetType() == typeof(Target))
-                    {
-                        if (!formattedText[i].ContainsKey(2))
-                        {
-                            formattedText[i].Add(2, new List<iSuperItem>());
-                            formattedText[i][2].Add(item);
-                        }
-                        else
-                        {
-                            formattedText[i][2].Add(item);
-                        }
-                    }
-                    else if (item.GetType() == typeof(Measure))
-                    {
-                        (item as Measure).SetSuperFrequency();
 
-                        if (!formattedText[i].ContainsKey(3))
+                        if (item.GetType() == typeof(Problem))
                         {
-                            formattedText[i].Add(3, new List<iSuperItem>());
-                            formattedText[i][3].Add(item);
+                            if (!formattedText[i].ContainsKey(0))
+                            {
+                                formattedText[i].Add(0, new List<iSuperItem>());
+                                formattedText[i][0].Add(item);
+                            }
+                            else
+                            {
+                                formattedText[i][0].Add(item);
+                            }
                         }
-                        else
+                        else if (item.GetType() == typeof(Resource))
                         {
-                            formattedText[i][3].Add(item);
+                            if (!formattedText[i].ContainsKey(1))
+                            {
+                                formattedText[i].Add(1, new List<iSuperItem>());
+                                formattedText[i][1].Add(item);
+                            }
+                            else
+                            {
+                                formattedText[i][1].Add(item);
+                            }
+                        }
+                        else if (item.GetType() == typeof(Target))
+                        {
+                            if (!formattedText[i].ContainsKey(2))
+                            {
+                                formattedText[i].Add(2, new List<iSuperItem>());
+                                formattedText[i][2].Add(item);
+                            }
+                            else
+                            {
+                                formattedText[i][2].Add(item);
+                            }
+                        }
+                        else if (item.GetType() == typeof(Measure))
+                        {
+                            (item as Measure).SetSuperFrequency();
+
+                            if (!formattedText[i].ContainsKey(3))
+                            {
+                                formattedText[i].Add(3, new List<iSuperItem>());
+                                formattedText[i][3].Add(item);
+                            }
+                            else
+                            {
+                                formattedText[i][3].Add(item);
+                            }
                         }
                     }
                 }
-            }
+            });
 
-            CreateTestPdf(formattedText);
+            await CreatePdf(formattedText);
         }
 
-        private void CreateTestPdf(Dictionary<int, Dictionary<int, List<iSuperItem>>> FormattedText)
+        private async Task CreatePdf(Dictionary<int, Dictionary<int, List<iSuperItem>>> FormattedText)
         {
-            PdfPTable table = new PdfPTable(10);
-            table.TotalWidth = PageSize.A3.Rotate().Width - 20; // -20 margin space
-            table.HorizontalAlignment = 0;
-            table.LockedWidth = true;
-            float[] widths = new float[] { 20f, 80f, 80f, 80f, 80f, 30f, 20f, 10f, 20, 10f };
-            table.SetWidths(widths);
+            var table = new PdfPTable(10);
 
-            int fixedPosition = 1;
-
-            foreach (var positions in FormattedText)
+            await Task.Factory.StartNew(() =>
             {
-                int problemCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(0) ? FormattedText[positions.Key][0].Count : 0 : 0);
-                int resourceCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(1) ? FormattedText[positions.Key][1].Count : 0 : 0);
-                int targetCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(2) ? FormattedText[positions.Key][2].Count : 0 : 0);
-                int measureCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(3) ? FormattedText[positions.Key][3].Count : 0 : 0);
-                int highest = problemCount;
+                table.TotalWidth = PageSize.A3.Rotate().Width - 20; // -20 margin space
+                table.HorizontalAlignment = 0;
+                table.LockedWidth = true;
+                float[] widths = new float[] { 20f, 80f, 80f, 80f, 80f, 30f, 20f, 10f, 20, 10f };
+                table.SetWidths(widths);
 
-                if (resourceCount > highest)
-                    highest = resourceCount;
-                if (targetCount > highest)
-                    highest = targetCount;
-                if (measureCount > highest)
-                    highest = measureCount;
+                int fixedPosition = 1;
 
-                var frequencyQueue = new Queue<string>();
-
-                AddCellToTable(table, fixedPosition + ".", false, highest);
-
-                for (int pos = 0; pos < highest; pos++)
+                foreach (var positions in FormattedText)
                 {
-                    for (int i = 0; i <= 8; i++)
+                    int problemCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(0) ? FormattedText[positions.Key][0].Count : 0 : 0);
+                    int resourceCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(1) ? FormattedText[positions.Key][1].Count : 0 : 0);
+                    int targetCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(2) ? FormattedText[positions.Key][2].Count : 0 : 0);
+                    int measureCount = (FormattedText.ContainsKey(positions.Key) ? FormattedText[positions.Key].ContainsKey(3) ? FormattedText[positions.Key][3].Count : 0 : 0);
+                    int highest = problemCount;
+
+                    if (resourceCount > highest)
+                        highest = resourceCount;
+                    if (targetCount > highest)
+                        highest = targetCount;
+                    if (measureCount > highest)
+                        highest = measureCount;
+
+                    var frequencyQueue = new Queue<string>();
+
+                    AddCellToTable(table, fixedPosition + ".", false, highest);
+
+                    for (int pos = 0; pos < highest; pos++)
                     {
-                        bool needToAddCell = true;
-
-                        if (i <= 3)
+                        for (int i = 0; i <= 8; i++)
                         {
-                            if (FormattedText.ContainsKey(positions.Key))
+                            bool needToAddCell = true;
+
+                            if (i <= 3)
                             {
-                                if (FormattedText[positions.Key].ContainsKey(i))
+                                if (FormattedText.ContainsKey(positions.Key))
                                 {
-                                    if (FormattedText[positions.Key][i].ElementAtOrDefault(pos) != null)
+                                    if (FormattedText[positions.Key].ContainsKey(i))
                                     {
-                                        if (pos == 0)
+                                        if (FormattedText[positions.Key][i].ElementAtOrDefault(pos) != null)
                                         {
-                                            var text = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperDescription;
-                                            
-                                            if (i == 3)
+                                            if (pos == 0)
                                             {
-                                                var frequency = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperFrequency;
+                                                var text = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperDescription;
 
-                                                if (frequency != null)
-                                                {
-                                                    frequencyQueue.Enqueue(frequency);
-                                                }
-                                                else
-                                                {
-                                                    frequencyQueue.Enqueue("");
-                                                }
+                                                //if (i == 3)
+                                                //{
+                                                //    var frequency = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperFrequency.ToLower();
+
+                                                //    if (frequency != null)
+                                                //    {
+                                                //        frequencyQueue.Enqueue(frequency);
+                                                //    }
+                                                //    else
+                                                //    {
+                                                //        frequencyQueue.Enqueue("");
+                                                //    }
+                                                //}
+
+                                                AddCellToTable(table, text, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.TOP_BORDER);
+                                                needToAddCell = false;
                                             }
-
-                                            AddCellToTable(table, text, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.TOP_BORDER);
-                                            needToAddCell = false;
-                                        }
-                                        else
-                                        {
-                                            var text = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperDescription;
-                                            
-                                            if (i == 3)
+                                            else
                                             {
-                                                var frequency = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperFrequency;
+                                                var text = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperDescription;
 
-                                                if (frequency != null)
-                                                {
-                                                    frequencyQueue.Enqueue(frequency);
-                                                }
-                                                else
-                                                {
-                                                    frequencyQueue.Enqueue("");
-                                                }
+                                                //if (i == 3)
+                                                //{
+                                                //    var frequency = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperFrequency.ToLower();
+
+                                                //    if (frequency != null)
+                                                //    {
+                                                //        frequencyQueue.Enqueue(frequency);
+                                                //    }
+                                                //    else
+                                                //    {
+                                                //        frequencyQueue.Enqueue("");
+                                                //    }
+                                                //}
+
+                                                AddCellToTable(table, text, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER);
+                                                needToAddCell = false;
                                             }
-
-                                            AddCellToTable(table, text, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER);
-                                            needToAddCell = false;
                                         }
                                     }
                                 }
                             }
-                        }
-                        
-                        if (i == 4)
-                        {
-                            if (pos == 0)
-                            {
-                                var frequency = (frequencyQueue.Count > 0) ? frequencyQueue.Dequeue() : "";
-                                AddCellToTable(table, frequency, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.TOP_BORDER);
-                                needToAddCell = false;
-                            }
-                            else
-                            {
-                                var frequency = (frequencyQueue.Count > 0) ? frequencyQueue.Dequeue() : "";
-                                AddCellToTable(table, frequency, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER);
-                                needToAddCell = false;
-                            }
-                        }
 
-                        if (needToAddCell)
-                        {
-                            if (pos == 0)
+                            //if (i == 4)
+                            //{
+                            //    if (pos == 0)
+                            //    {
+                            //        var frequency = (frequencyQueue.Count > 0) ? frequencyQueue.Dequeue() : "";
+                            //        AddCellToTable(table, frequency, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.TOP_BORDER);
+                            //        needToAddCell = false;
+                            //    }
+                            //    else
+                            //    {
+                            //        var frequency = (frequencyQueue.Count > 0) ? frequencyQueue.Dequeue() : "";
+                            //        AddCellToTable(table, frequency, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER);
+                            //        needToAddCell = false;
+                            //    }
+                            //}
+
+                            if (needToAddCell)
                             {
-                                AddCellToTable(table, "", false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.TOP_BORDER);
-                            }
-                            else
-                            {
-                                AddCellToTable(table, "", false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER);
+                                if (pos == 0)
+                                {
+                                    AddCellToTable(table, "", false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.TOP_BORDER);
+                                }
+                                else
+                                {
+                                    AddCellToTable(table, "", false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER);
+                                }
                             }
                         }
                     }
+
+                    fixedPosition++;
                 }
 
-                fixedPosition++;
-            }
+                AddFooterToTable(table, "");
+            });
 
-            AddFooterToTable(table, "");
+            Dispatcher.Invoke(
+                new Action(delegate()
+                    {
+                        var saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+                        saveFileDialog.Filter = "PDF Dateien|*.pdf";
+                        saveFileDialog.Title = "Als PDF speichern";
+                        saveFileDialog.ValidateNames = true;
+                        saveFileDialog.FileName = SelectedPatient.PatientId + " - " + SelectedPatient.PatientVorname + " " + SelectedPatient.PatientNachname + ".pdf";
+                        saveFileDialog.ShowDialog();
 
-            var saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            saveFileDialog.Filter = "PDF Dateien|*.pdf";
-            saveFileDialog.Title = "Als PDF speichern";
-            saveFileDialog.ValidateNames = true;
-            saveFileDialog.FileName = SelectedPatient.PatientId + " - " + SelectedPatient.PatientVorname + " " + SelectedPatient.PatientNachname + ".pdf";
-            saveFileDialog.ShowDialog();
+                        if (saveFileDialog.FileName != "")
+                        {
+                            var document = new Document(PageSize.A3.Rotate(), 10f, 10f, 10f, 20f);
+                            var writer = PdfWriter.GetInstance(document, new FileStream(saveFileDialog.FileName, FileMode.Create));
+                            writer.PageEvent = new CustomPageEventHandler();
+                            document.Open();
 
-            if (saveFileDialog.FileName != "")
-            {
-                var document = new Document(PageSize.A3.Rotate(), 10f, 10f, 10f, 20f);
-                var writer = PdfWriter.GetInstance(document, new FileStream(saveFileDialog.FileName, FileMode.Create));
-                writer.PageEvent = new CustomPageEventHandler();
-                document.Open();
-
-                document.Add(table);
-                document.Close();
-            }
+                            document.Add(table);
+                            document.Close();
+                        }
+                    }));
         }
 
         private void AddFooterToTable(PdfPTable table, string text)
         {
             PdfPCell cell = new PdfPCell(new Phrase(text));
-            cell.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
+            cell.HorizontalAlignment = PdfPCell.ALIGN_LEFT;
             cell.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
             cell.Colspan = 10;
             cell.Padding = 5;
@@ -1221,18 +1237,17 @@ namespace PflegedientPlan
 
         private void AddCellToTable(PdfPTable table, string text, bool header = false, int span = 1, int border = iTextSharp.text.Rectangle.TOP_BORDER | iTextSharp.text.Rectangle.BOTTOM_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.RIGHT_BORDER)
         {
-            BaseFont bfTimes = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, false);
-
-            iTextSharp.text.Font times = new iTextSharp.text.Font(bfTimes, 11, iTextSharp.text.Font.NORMAL, iTextSharp.text.BaseColor.BLACK);
+            FontFactory.RegisterDirectories();
+            var fontArial = new Font(FontFactory.GetFont("Arial", 11, Font.NORMAL));
 
             if (header)
-                times.SetStyle(Font.BOLD);
+                fontArial.SetStyle(Font.BOLD);
 
-            PdfPCell cell = new PdfPCell(new Phrase(text, times));
+            PdfPCell cell = new PdfPCell(new Phrase(text, fontArial));
             cell.Border = border;
             cell.Rowspan = span;
             cell.Padding = 5;
-            cell.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
+            cell.HorizontalAlignment = PdfPCell.ALIGN_LEFT;
             table.AddCell(cell);
         }
         #endregion

@@ -60,9 +60,14 @@ namespace PflegedientPlan.Utils
         public async Task<PatientUserMask> LoadPatient()
         {
             // checks if the folder exists
-            await CheckFolder();
+            var folderExists = await CheckFolder();
+            if (!folderExists)
+                return null;
+
             // checks if the file exists
-            await CheckFile();
+            var fileExists = await CheckFile();
+            if (!fileExists)
+                return null;
 
             // using a streamreader to read content from json file
             using (var reader = new StreamReader(Path.Combine(PathToFolder, "patients", "patient-" + SelectedPatient.PatientId + ".json")))
@@ -85,28 +90,38 @@ namespace PflegedientPlan.Utils
         /// <summary>
         /// Checks if a folder exists, if not creates it
         /// </summary>
-        private async Task CheckFolder()
+        private async Task<bool> CheckFolder()
         {
-            await Task.Run(() =>
+            return await Task<bool>.Run(() =>
             {
+                var result = true;
+
                 if (!Directory.Exists(Path.Combine(PathToFolder, "patients")))
                 {
                     Directory.CreateDirectory(Path.Combine(PathToFolder, "patients"));
+                    result = false;
                 }
+
+                return result;
             });
         }
 
         /// <summary>
         /// Checks if a patient.json file exits, if not creates it.
         /// </summary>
-        private async Task CheckFile()
+        private async Task<bool> CheckFile()
         {
-            await Task.Run(() =>
+            return await Task.Run<bool>(() =>
             {
+                var result = true;
+
                 if (!File.Exists(Path.Combine(PathToFolder, "patients", "patient-" + SelectedPatient.PatientId + ".json")))
                 {
                     File.Create(Path.Combine(PathToFolder, "patients", "patient-" + SelectedPatient.PatientId + ".json"));
+                    result = false;
                 }
+
+                return result;
             });
         }
 

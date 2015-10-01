@@ -35,7 +35,7 @@ namespace PflegedientPlan.Utils
 
             Chunk glue = new Chunk(new VerticalPositionMark());
 
-            iTextSharp.text.Image image = iTextSharp.text.Image.GetInstance(@"C:\Users\Henrik\Source\Repos\Pflegedienst-Planung\PflegedientPlan\Assets\logo.PNG");
+            iTextSharp.text.Image image = iTextSharp.text.Image.GetInstance(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\VIS VITALIS\\images\\logo.PNG");
             image.ScalePercent(60);
 
             var p = new iTextSharp.text.Paragraph();
