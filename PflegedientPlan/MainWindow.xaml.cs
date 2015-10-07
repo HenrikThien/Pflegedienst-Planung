@@ -36,6 +36,7 @@ namespace PflegedientPlan
     public partial class MainWindow : Window
     {
         public static Patient SelectedPatient { get; set; }
+        public static Queue<Patient> SelectedPatientQueue = new Queue<Patient>();
 
         private readonly ObservableCollection<Patient> _patientList = new ObservableCollection<Patient>();
         private ObservableCollection<Activity> _activityList = new ObservableCollection<Activity>();
@@ -50,9 +51,20 @@ namespace PflegedientPlan
             activitysComboBox.SelectionChanged += activitysComboBox_SelectionChanged;
 
             problemsDataGrid.CellEditEnding += problemsDataGrid_CellEditEnding;
+            problemsDataGrid.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(problemsDataGrid_PreviewMouseLeftButtonDown);
+            problemsDataGrid.Drop += problemsDataGrid_Drop;
+
             resourcesDataGrid.CellEditEnding += resourcesDataGrid_CellEditEnding;
+            resourcesDataGrid.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(resourcesDataGrid_PreviewMouseLeftButtonDown);
+            resourcesDataGrid.Drop += resourcesDataGrid_Drop;
+
             targetsDataGrid.CellEditEnding += targetsDataGrid_CellEditEnding;
+            targetsDataGrid.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(targetsDataGrid_PreviewMouseLeftButtonDown);
+            targetsDataGrid.Drop += targetsDataGrid_Drop;
+
             measuresDataGrid.CellEditEnding += measuresDataGrid_CellEditEnding;
+            measuresDataGrid.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(measuresDataGrid_PreviewMouseLeftButtonDown);
+            measuresDataGrid.Drop += measuresDataGrid_Drop;
         }
 
         #region cell edit ending events
@@ -301,7 +313,7 @@ namespace PflegedientPlan
                 }
             }
 
-            await Task.Run(() => Thread.Sleep(1000));
+            await Task.Run(() => Thread.Sleep(2000));
 
             ClearValue(HeightProperty);
             ClearValue(WidthProperty);
@@ -309,6 +321,7 @@ namespace PflegedientPlan
             ClearValue(MaxWidthProperty);
             ClearValue(MinHeightProperty);
             ClearValue(MinWidthProperty);
+
             progressGrid.Visibility = System.Windows.Visibility.Hidden;
             mainGrid.Visibility = System.Windows.Visibility.Visible;
             WindowState = System.Windows.WindowState.Maximized;
@@ -544,11 +557,33 @@ namespace PflegedientPlan
         }
         #endregion
 
+        bool IsWindowOpen<T>(string name = "") where T : Window
+        {
+            return string.IsNullOrEmpty(name)
+               ? Application.Current.Windows.OfType<T>().Any()
+               : Application.Current.Windows.OfType<T>().Any(w => w.Name.Equals(name));
+        }
+
+        private AddActivity activityWindow;
+        private AddCategory categoryWindow;
+        private AddToMask addToMaskWindow;
+
         private void addActivityMenu_Click(object sender, RoutedEventArgs e)
         {
-            var activity = new AddActivity();
-            activity.OnMainNeedsAnUpdate += activity_OnMainNeedsAnUpdate;
-            activity.Show();
+            if (IsWindowOpen<Window>("AddActivity") && activityWindow != null)
+            {
+                activityWindow.Activate();
+                if (activityWindow.WindowState == System.Windows.WindowState.Minimized)
+                {
+                    activityWindow.WindowState = System.Windows.WindowState.Normal;
+                }
+                return;
+            }
+
+            activityWindow = new AddActivity();
+            activityWindow.Name = "AddActivity";
+            activityWindow.OnMainNeedsAnUpdate += activity_OnMainNeedsAnUpdate;
+            activityWindow.Show();
         }
 
         private void activity_OnMainNeedsAnUpdate(ObservableCollection<Activity> activityList)
@@ -570,9 +605,20 @@ namespace PflegedientPlan
 
         private void addCategoryMenu_Click(object sender, RoutedEventArgs e)
         {
-            var category = new AddCategory();
-            category.OnMainNeedsAnUpdate += category_OnMainNeedsAnUpdate;
-            category.Show();
+            if (IsWindowOpen<Window>("AddCategory") && categoryWindow != null)
+            {
+                categoryWindow.Activate();
+                if (categoryWindow.WindowState == System.Windows.WindowState.Minimized)
+                {
+                    categoryWindow.WindowState = System.Windows.WindowState.Normal;
+                }
+                return;
+            }
+
+            categoryWindow = new AddCategory();
+            categoryWindow.Name = "AddCategory";
+            categoryWindow.OnMainNeedsAnUpdate += category_OnMainNeedsAnUpdate;
+            categoryWindow.Show();
         }
 
         private void category_OnMainNeedsAnUpdate(ObservableCollection<Category> categoryList)
@@ -682,7 +728,20 @@ namespace PflegedientPlan
                 return;
             }
 
-            var addToMaskWindow = new AddToMask(selectedPatient, selectedActivity, selectedCategory);
+            if (IsWindowOpen<Window>("AddToMask") && addToMaskWindow != null)
+            {
+                addToMaskWindow.Activate();
+
+                if (addToMaskWindow.WindowState == System.Windows.WindowState.Minimized)
+                {
+                    addToMaskWindow.WindowState = System.Windows.WindowState.Normal;
+                }
+
+                return;
+            }
+
+            addToMaskWindow = new AddToMask(selectedPatient, selectedActivity, selectedCategory);
+            addToMaskWindow.Name = "AddToMask";
             addToMaskWindow.OnProblemListUpdated += addToMaskWindow_OnProblemListUpdated;
             addToMaskWindow.OnResourceListUpdated += addToMaskWindow_OnResourceListUpdated;
             addToMaskWindow.OnTargetListUpdated += addToMaskWindow_OnTargetListUpdated;
@@ -697,6 +756,207 @@ namespace PflegedientPlan
                 return;
 
             problemsDataGrid.ItemsSource = StaticHolder.SelectedProblems[SelectedPatient.PatientId];
+        }
+
+        public delegate Point GetPosition(IInputElement element);
+        int problemsRowIndex = -1;
+        int resourcesRowIndex = -1;
+        int targetsRowIndex = -1;
+        int measuresRowIndex = -1;
+
+        #region Problems drag and drop
+        void problemsDataGrid_Drop(object sender, DragEventArgs e)
+        {
+            if (problemsRowIndex < 0)
+                return;
+            int index = this.GetCurrentRowIndex(e.GetPosition, problemsDataGrid);
+            if (index < 0)
+                return;
+            if (index == problemsRowIndex)
+                return;
+            if (index == problemsDataGrid.Items.Count - 1)
+            {
+                MessageBox.Show("Fehler beim Verschieben!");
+                return;
+            }
+            var productCollection = StaticHolder.SelectedProblems[SelectedPatient.PatientId];
+            var changedProduct = productCollection[problemsRowIndex];
+            productCollection.RemoveAt(problemsRowIndex);
+            productCollection.Insert(index, changedProduct);
+        }
+
+        void problemsDataGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            problemsRowIndex = GetCurrentRowIndex(e.GetPosition, problemsDataGrid);
+            if (problemsRowIndex < 0)
+                return;
+            problemsDataGrid.SelectedIndex = problemsRowIndex;
+            var selectedEmp = problemsDataGrid.Items[problemsRowIndex] as Problem;
+            if (selectedEmp == null)
+                return;
+            DragDropEffects dragdropeffects = DragDropEffects.Move;
+            if (DragDrop.DoDragDrop(problemsDataGrid, selectedEmp, dragdropeffects) != DragDropEffects.None)
+            {
+                problemsDataGrid.SelectedItem = selectedEmp;
+            }
+
+            selectedEmp.RealListIndex = problemsRowIndex;
+        }
+        #endregion
+
+        #region Resources drag and drop
+        void resourcesDataGrid_Drop(object sender, DragEventArgs e)
+        {
+            if (resourcesRowIndex < 0)
+                return;
+            int index = this.GetCurrentRowIndex(e.GetPosition, resourcesDataGrid);
+            if (index < 0)
+                return;
+            if (index == resourcesRowIndex)
+                return;
+            if (index == resourcesDataGrid.Items.Count - 1)
+            {
+                MessageBox.Show("Fehler beim Verschieben!");
+                return;
+            }
+            var productCollection = StaticHolder.SelectedResources[SelectedPatient.PatientId];
+            var changedProduct = productCollection[resourcesRowIndex];
+            productCollection.RemoveAt(resourcesRowIndex);
+            productCollection.Insert(index, changedProduct);
+        }
+
+        void resourcesDataGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            resourcesRowIndex = GetCurrentRowIndex(e.GetPosition, resourcesDataGrid);
+            if (resourcesRowIndex < 0)
+                return;
+            resourcesDataGrid.SelectedIndex = resourcesRowIndex;
+            var selectedEmp = resourcesDataGrid.Items[resourcesRowIndex] as Resource;
+            if (selectedEmp == null)
+                return;
+            DragDropEffects dragdropeffects = DragDropEffects.Move;
+            if (DragDrop.DoDragDrop(resourcesDataGrid, selectedEmp, dragdropeffects)
+                                != DragDropEffects.None)
+            {
+                resourcesDataGrid.SelectedItem = selectedEmp;
+            }
+
+            selectedEmp.RealListIndex = resourcesRowIndex;
+        }
+        #endregion
+
+        #region Targets drag and drop
+        void targetsDataGrid_Drop(object sender, DragEventArgs e)
+        {
+            if (targetsRowIndex < 0)
+                return;
+            int index = this.GetCurrentRowIndex(e.GetPosition, targetsDataGrid);
+            if (index < 0)
+                return;
+            if (index == targetsRowIndex)
+                return;
+            if (index == targetsDataGrid.Items.Count - 1)
+            {
+                MessageBox.Show("Fehler beim Verschieben!");
+                return;
+            }
+            var productCollection = StaticHolder.SelectedTargets[SelectedPatient.PatientId];
+            var changedProduct = productCollection[targetsRowIndex];
+            productCollection.RemoveAt(targetsRowIndex);
+            productCollection.Insert(index, changedProduct);
+        }
+
+        void targetsDataGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            targetsRowIndex = GetCurrentRowIndex(e.GetPosition, targetsDataGrid);
+            if (targetsRowIndex < 0)
+                return;
+            targetsDataGrid.SelectedIndex = targetsRowIndex;
+            var selectedEmp = targetsDataGrid.Items[targetsRowIndex] as Target;
+            if (selectedEmp == null)
+                return;
+            DragDropEffects dragdropeffects = DragDropEffects.Move;
+            if (DragDrop.DoDragDrop(targetsDataGrid, selectedEmp, dragdropeffects)
+                                != DragDropEffects.None)
+            {
+                targetsDataGrid.SelectedItem = selectedEmp;
+            }
+
+            selectedEmp.RealListIndex = targetsRowIndex;
+        }
+        #endregion
+
+        #region Measures drag and drop
+        void measuresDataGrid_Drop(object sender, DragEventArgs e)
+        {
+            if (measuresRowIndex < 0)
+                return;
+            int index = this.GetCurrentRowIndex(e.GetPosition, measuresDataGrid);
+            if (index < 0)
+                return;
+            if (index == measuresRowIndex)
+                return;
+            if (index == measuresDataGrid.Items.Count - 1)
+            {
+                MessageBox.Show("Fehler beim Verschieben!");
+                return;
+            }
+            var productCollection = StaticHolder.SelectedMeasures[SelectedPatient.PatientId];
+            var changedProduct = productCollection[measuresRowIndex];
+            productCollection.RemoveAt(measuresRowIndex);
+            productCollection.Insert(index, changedProduct);
+        }
+
+        void measuresDataGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            measuresRowIndex = GetCurrentRowIndex(e.GetPosition, measuresDataGrid);
+            if (measuresRowIndex < 0)
+                return;
+            measuresDataGrid.SelectedIndex = measuresRowIndex;
+            var selectedEmp = measuresDataGrid.Items[measuresRowIndex] as Measure;
+            if (selectedEmp == null)
+                return;
+            DragDropEffects dragdropeffects = DragDropEffects.Move;
+            if (DragDrop.DoDragDrop(measuresDataGrid, selectedEmp, dragdropeffects) != DragDropEffects.None)
+            {
+                measuresDataGrid.SelectedItem = selectedEmp;
+            }
+
+            selectedEmp.RealListIndex = measuresRowIndex;
+        }
+        #endregion
+
+        private bool GetMouseTargetRow(Visual theTarget, GetPosition position)
+        {
+            Rect rect = VisualTreeHelper.GetDescendantBounds(theTarget);
+            Point point = position((IInputElement)theTarget);
+            return rect.Contains(point);
+        }
+
+        private DataGridRow GetRowItem(int index, DataGrid grid)
+        {
+            if (grid.ItemContainerGenerator.Status
+                    != GeneratorStatus.ContainersGenerated)
+                return null;
+            return grid.ItemContainerGenerator.ContainerFromIndex(index)
+                                                            as DataGridRow;
+        }
+        private int GetCurrentRowIndex(GetPosition pos, DataGrid grid)
+        {
+            int curIndex = -1;
+            for (int i = 0; i < grid.Items.Count; i++)
+            {
+                DataGridRow itm = GetRowItem(i, grid);
+                if (itm != null)
+                {
+                    if (GetMouseTargetRow(itm, pos))
+                    {
+                        curIndex = i;
+                        break;
+                    }
+                }
+            }
+            return curIndex;
         }
 
         private void problemsListBoxItemUP_Click(object sender, RoutedEventArgs e)
@@ -988,21 +1248,52 @@ namespace PflegedientPlan
 
         private async void LoadExportToPDFAsync()
         {
-            await ExportSelectedToPdf();
+            var filePath = "undefined";
+            var selectedPatient = SelectedPatient;
+
+            await Task.Factory.StartNew(() =>
+            {
+                Dispatcher.Invoke(
+                    new Action(delegate()
+                        {
+                            var saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+                            saveFileDialog.Filter = "PDF Dateien|*.pdf";
+                            saveFileDialog.Title = "Als PDF speichern";
+                            saveFileDialog.ValidateNames = true;
+                            saveFileDialog.FileName = SelectedPatient.PatientId + " - " + SelectedPatient.PatientVorname + " " + SelectedPatient.PatientNachname + ".pdf";
+                            saveFileDialog.ShowDialog();
+
+                            if (saveFileDialog.FileName != "")
+                            {
+                                filePath = saveFileDialog.FileName;
+                            }
+                        }));
+            });
+
+            if (filePath == "undefined")
+                return;
+
+            SelectedPatientQueue.Enqueue(selectedPatient);
+
+            statusBarLabel.Content = "Die PDF wird erstellt, bitte warten...";
+            statusBar.Visibility = System.Windows.Visibility.Visible;
+
+            await ExportSelectedToPdf(filePath, SelectedPatient);
+
+            statusBar.Visibility = System.Windows.Visibility.Hidden;
         }
 
-        private async Task ExportSelectedToPdf()
+        private async Task ExportSelectedToPdf(string filePath, Patient tempPatient)
         {
             var allItems = new List<iSuperItem>();
             var formattedText = new Dictionary<int, Dictionary<int, List<iSuperItem>>>();
 
             await Task.Factory.StartNew(() =>
             {
-                allItems.AddRange((from i in StaticHolder.SelectedProblems[SelectedPatient.PatientId] select i).ToList());
-                allItems.AddRange((from i in StaticHolder.SelectedResources[SelectedPatient.PatientId] select i).ToList());
-                allItems.AddRange((from i in StaticHolder.SelectedTargets[SelectedPatient.PatientId] select i).ToList());
-                allItems.AddRange((from i in StaticHolder.SelectedMeasures[SelectedPatient.PatientId] select i).ToList());
-
+                allItems.AddRange((from i in StaticHolder.SelectedProblems[tempPatient.PatientId] select i).ToList());
+                allItems.AddRange((from i in StaticHolder.SelectedResources[tempPatient.PatientId] select i).ToList());
+                allItems.AddRange((from i in StaticHolder.SelectedTargets[tempPatient.PatientId] select i).ToList());
+                allItems.AddRange((from i in StaticHolder.SelectedMeasures[tempPatient.PatientId] select i).ToList());
 
                 for (int i = 0; i < allItems.Count; i++)
                 {
@@ -1069,12 +1360,13 @@ namespace PflegedientPlan
                 }
             });
 
-            await CreatePdf(formattedText);
+            await CreatePdf(formattedText, filePath);
         }
 
-        private async Task CreatePdf(Dictionary<int, Dictionary<int, List<iSuperItem>>> FormattedText)
+        private async Task CreatePdf(Dictionary<int, Dictionary<int, List<iSuperItem>>> FormattedText, string filePath)
         {
             var table = new PdfPTable(10);
+            table.Complete = false;
 
             await Task.Factory.StartNew(() =>
             {
@@ -1198,31 +1490,20 @@ namespace PflegedientPlan
 
                     fixedPosition++;
                 }
-
+                table.Complete = true;
                 AddFooterToTable(table, "");
             });
 
-            Dispatcher.Invoke(
-                new Action(delegate()
-                    {
-                        var saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-                        saveFileDialog.Filter = "PDF Dateien|*.pdf";
-                        saveFileDialog.Title = "Als PDF speichern";
-                        saveFileDialog.ValidateNames = true;
-                        saveFileDialog.FileName = SelectedPatient.PatientId + " - " + SelectedPatient.PatientVorname + " " + SelectedPatient.PatientNachname + ".pdf";
-                        saveFileDialog.ShowDialog();
+            await Task.Factory.StartNew(() =>
+            {
+                var document = new Document(PageSize.A3.Rotate(), 10f, 10f, 10f, 20f);
+                var writer = PdfWriter.GetInstance(document, new FileStream(filePath, FileMode.Create));
+                writer.PageEvent = new CustomPageEventHandler();
+                document.Open();
 
-                        if (saveFileDialog.FileName != "")
-                        {
-                            var document = new Document(PageSize.A3.Rotate(), 10f, 10f, 10f, 20f);
-                            var writer = PdfWriter.GetInstance(document, new FileStream(saveFileDialog.FileName, FileMode.Create));
-                            writer.PageEvent = new CustomPageEventHandler();
-                            document.Open();
-
-                            document.Add(table);
-                            document.Close();
-                        }
-                    }));
+                document.Add(table);
+                document.Close();
+            });
         }
 
         private void AddFooterToTable(PdfPTable table, string text)
@@ -1238,7 +1519,7 @@ namespace PflegedientPlan
         private void AddCellToTable(PdfPTable table, string text, bool header = false, int span = 1, int border = iTextSharp.text.Rectangle.TOP_BORDER | iTextSharp.text.Rectangle.BOTTOM_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.RIGHT_BORDER)
         {
             FontFactory.RegisterDirectories();
-            var fontArial = new Font(FontFactory.GetFont("Arial", 11, Font.NORMAL));
+            var fontArial = new Font(FontFactory.GetFont("Arial", 7, Font.NORMAL));
 
             if (header)
                 fontArial.SetStyle(Font.BOLD);

@@ -22,8 +22,20 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_4C96B848B897495EBD8789468BB63FB1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_515D82F28E7F51EE1A736936D2FB4A5F"
         "OwnerKey" = "8:_A3BE1BC6C20945B3B54662B0F5279A00"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6895CBAE33FF4B3EBF884E266C3A362D"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -192,6 +204,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4C96B848B897495EBD8789468BB63FB1"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\Downloads\\ic_launcher.ico"
+            "TargetName" = "8:ic_launcher.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_CFFEC32DBD54420D928DA0592289C574"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_515D82F28E7F51EE1A736936D2FB4A5F"
             {
             "AssemblyRegister" = "3:1"
@@ -221,6 +253,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6895CBAE33FF4B3EBF884E266C3A362D"
+            {
+            "SourcePath" = "8:..\\..\\VisVitalisDroidApp\\visvitalis\\Resources\\drawable-xxxhdpi\\ic_launcher.png"
+            "TargetName" = "8:ic_launcher.png"
+            "Tag" = "8:"
+            "Folder" = "8:_CFFEC32DBD54420D928DA0592289C574"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_79990E41F83D4FF1959A2A2CA7D97B67"
@@ -323,7 +375,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:VIS VITALIS - Pflegeplanung"
         "ProductCode" = "8:{6B6AC1FE-2235-4348-8E22-3BBE801BA3E5}"
-        "PackageCode" = "8:{5DDC2625-BE70-46DE-9C28-892DB827C81F}"
+        "PackageCode" = "8:{21AABD9C-4B0D-4E1A-A9D4-01356D13CA96}"
         "UpgradeCode" = "8:{6ADD5C24-F811-4DAF-88F6-03E0291E8D0F}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -454,7 +506,7 @@
             "Target" = "8:_A3BE1BC6C20945B3B54662B0F5279A00"
             "Folder" = "8:_5605C52FD4A24E8ABFB5B640C1B5436E"
             "WorkingFolder" = "8:_23FAC1A4D79B4C41B2A2BFC76791E80A"
-            "Icon" = "8:"
+            "Icon" = "8:_4C96B848B897495EBD8789468BB63FB1"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_ED1A7D53963A4BE788EDFAD9B93107FE"
@@ -468,7 +520,7 @@
             "Target" = "8:_A3BE1BC6C20945B3B54662B0F5279A00"
             "Folder" = "8:_D8B519FA05B1403890A92C7C58272161"
             "WorkingFolder" = "8:_23FAC1A4D79B4C41B2A2BFC76791E80A"
-            "Icon" = "8:"
+            "Icon" = "8:_4C96B848B897495EBD8789468BB63FB1"
             "Feature" = "8:"
             }
         }

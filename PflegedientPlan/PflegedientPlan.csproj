@@ -61,6 +61,9 @@
   <PropertyGroup>
     <SignManifests>true</SignManifests>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>ic_launcher.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="itextsharp">
       <HintPath>..\packages\iTextSharp.5.5.6\lib\itextsharp.dll</HintPath>
@@ -185,6 +188,9 @@
     <Resource Include="Assets\logo.PNG">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="ic_launcher.ico" />
+    <None Include="Resources\ic_launcher.png" />
+    <Resource Include="Assets\ic_launcher.png" />
     <Content Include="Storage.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

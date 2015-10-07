@@ -14,7 +14,7 @@ namespace PflegedientPlan
     sealed class DatabaseClient : IDisposable
     {
         private static string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\VIS VITALIS\\Storage.mdf";
-        private string ConnectionString = @"Data Source=(LocalDB)\v11.0;AttachDbFilename=" + AppDataPath + ";Integrated Security=True";
+        private string ConnectionString = @"Data Source=(LocalDB)\v11.0;AttachDbFilename=" + AppDataPath + ";Integrated Security=True;Connection Timeout=30";
 
         private readonly SqlConnection _connection;
         private readonly List<SqlParameter> _parameter;

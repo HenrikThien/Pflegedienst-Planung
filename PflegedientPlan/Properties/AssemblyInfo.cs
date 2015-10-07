@@ -8,7 +8,7 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Pflegedienst Planung")]
-[assembly: AssemblyDescription("Ein Programm zur erstellung von Pflegeplänen")]
+[assembly: AssemblyDescription("Ein Programm zur Erstellung von Pflegeplänen")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Thien,VIS VITALIS")]
 [assembly: AssemblyProduct("Pflegedient Planung")]

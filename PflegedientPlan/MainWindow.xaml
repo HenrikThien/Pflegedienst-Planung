@@ -3,16 +3,42 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:PflegedientPlan"
         Title="Pflegeplanung - VIS VITALIS" WindowStartupLocation="CenterScreen" Width="600" Height="600" MaxHeight="600" MaxWidth="600" MinHeight="600" MinWidth="600">
+    <Window.Resources>
+        <Style x:Key="Spinner" TargetType="Image">
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Image.RenderTransform">
+                <Setter.Value>
+                    <RotateTransform CenterX="12" CenterY="12" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger x:Name="rotateTrigger" Property="IsEnabled" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                                        Storyboard.TargetProperty="RenderTransform.Angle"
+                                        From="0"
+                                        To="360"
+                                        Duration="0:0:2"
+                                        RepeatBehavior="Forever" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid x:Name="progressGrid" Background="Beige" Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>    
 
-            <Label Content="Das Programm wird geladen, bitte warten.." FontSize="25" HorizontalAlignment="Center" Grid.Row="0" />
-            <ProgressBar IsIndeterminate="True" Height="20" Grid.Row="1" VerticalAlignment="Stretch" Margin="20" />
+            <Label Content="Das Programm wird geladen, bitte warten..." FontSize="25" HorizontalAlignment="Center" Grid.Row="0" />
+            <Image x:Name="RotateImage" Source="Assets/ic_launcher.png" Margin="50" Height="150" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Style="{StaticResource Spinner}" />
+            <!--<ProgressBar IsIndeterminate="True" Height="20" Grid.Row="2" VerticalAlignment="Stretch" Margin="20" />-->
         </Grid>
         
         <Grid x:Name="mainGrid" Background="Beige" Visibility="Hidden">
@@ -25,6 +51,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" MinWidth="400" />
@@ -178,7 +205,7 @@
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
-                        <DataGrid x:Name="problemsDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="False" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
+                        <DataGrid x:Name="problemsDataGrid" AllowDrop="True" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="False" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#Pos." Width="Auto"
                             Binding="{Binding Position, NotifyOnTargetUpdated=True}" />
@@ -211,7 +238,7 @@
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
-                        <DataGrid x:Name="resourcesDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="False" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
+                        <DataGrid x:Name="resourcesDataGrid" AllowDrop="True" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="False" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#Pos." Width="Auto"
                             Binding="{Binding Position, NotifyOnTargetUpdated=True}"/>
@@ -244,7 +271,7 @@
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
 
-                        <DataGrid x:Name="targetsDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="false" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
+                        <DataGrid x:Name="targetsDataGrid" AllowDrop="True" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="false" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#Pos." Width="Auto"
                             Binding="{Binding Position, NotifyOnTargetUpdated=True}"/>
@@ -276,8 +303,7 @@
                         <Button Style="{DynamicResource IconButtonStyle}" Grid.Column="2" Click="measuresListBoxItemDelete_Click">
                             <Image Source="Assets/basket33.png" MaxWidth="32" MaxHeight="32" />
                         </Button>
-
-                        <DataGrid x:Name="measuresDataGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="False" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
+                        <DataGrid x:Name="measuresDataGrid" AllowDrop="True" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="Beige" IsReadOnly="false" CanUserAddRows="False" BorderThickness="0" SelectionMode="Single" AutoGenerateColumns="False" ItemsSource="{Binding}" Margin="5">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#Pos." Width="Auto"
                                     Binding="{Binding Position, NotifyOnTargetUpdated=True}"/>
@@ -293,6 +319,12 @@
                 </GroupBox>
             </Grid>
             <!-- Uebersicht end -->
+            <DockPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="8">
+                <StatusBar x:Name="statusBar" DockPanel.Dock="Bottom" Visibility="Hidden">
+                    <Label x:Name="statusBarLabel">Lade...Bitte warten</Label>
+                    <ProgressBar Width="100" Height="15" IsIndeterminate="True"/>
+                </StatusBar>
+            </DockPanel>
         </Grid>
     </Grid>
 </Window>
