@@ -1251,6 +1251,9 @@ namespace PflegedientPlan
             var filePath = "undefined";
             var selectedPatient = SelectedPatient;
 
+            if (selectedPatient == null)
+                return;
+
             await Task.Factory.StartNew(() =>
             {
                 Dispatcher.Invoke(
@@ -1415,40 +1418,12 @@ namespace PflegedientPlan
                                             {
                                                 var text = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperDescription;
 
-                                                //if (i == 3)
-                                                //{
-                                                //    var frequency = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperFrequency.ToLower();
-
-                                                //    if (frequency != null)
-                                                //    {
-                                                //        frequencyQueue.Enqueue(frequency);
-                                                //    }
-                                                //    else
-                                                //    {
-                                                //        frequencyQueue.Enqueue("");
-                                                //    }
-                                                //}
-
                                                 AddCellToTable(table, text, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.TOP_BORDER);
                                                 needToAddCell = false;
                                             }
                                             else
                                             {
                                                 var text = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperDescription;
-
-                                                //if (i == 3)
-                                                //{
-                                                //    var frequency = FormattedText[positions.Key][i].ElementAtOrDefault(pos).SuperFrequency.ToLower();
-
-                                                //    if (frequency != null)
-                                                //    {
-                                                //        frequencyQueue.Enqueue(frequency);
-                                                //    }
-                                                //    else
-                                                //    {
-                                                //        frequencyQueue.Enqueue("");
-                                                //    }
-                                                //}
 
                                                 AddCellToTable(table, text, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER);
                                                 needToAddCell = false;
@@ -1457,22 +1432,6 @@ namespace PflegedientPlan
                                     }
                                 }
                             }
-
-                            //if (i == 4)
-                            //{
-                            //    if (pos == 0)
-                            //    {
-                            //        var frequency = (frequencyQueue.Count > 0) ? frequencyQueue.Dequeue() : "";
-                            //        AddCellToTable(table, frequency, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER | iTextSharp.text.Rectangle.TOP_BORDER);
-                            //        needToAddCell = false;
-                            //    }
-                            //    else
-                            //    {
-                            //        var frequency = (frequencyQueue.Count > 0) ? frequencyQueue.Dequeue() : "";
-                            //        AddCellToTable(table, frequency, false, 1, iTextSharp.text.Rectangle.RIGHT_BORDER | iTextSharp.text.Rectangle.LEFT_BORDER);
-                            //        needToAddCell = false;
-                            //    }
-                            //}
 
                             if (needToAddCell)
                             {
